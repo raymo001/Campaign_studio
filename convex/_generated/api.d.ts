@@ -8,13 +8,25 @@
  * @module
  */
 
+import type * as campaigns from "../campaigns.js";
+import type * as crons from "../crons.js";
+import type * as feed from "../feed.js";
+import type * as feedStore from "../feedStore.js";
+import type * as products from "../products.js";
+
 import type {
   ApiFromModules,
   FilterApi,
   FunctionReference,
 } from "convex/server";
 
-declare const fullApi: ApiFromModules<{}>;
+declare const fullApi: ApiFromModules<{
+  campaigns: typeof campaigns;
+  crons: typeof crons;
+  feed: typeof feed;
+  feedStore: typeof feedStore;
+  products: typeof products;
+}>;
 
 /**
  * A utility for referencing Convex functions in your app's public API.

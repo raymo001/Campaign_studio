@@ -14,7 +14,7 @@ export const generateImageSchema = z.object({
   model: z.string().min(1).max(200).optional(),
   size: sizeSchema,
   aspectRatio: aspectRatioSchema,
-  imageSize: z.enum(["0.5K", "1K", "2K", "4K"]).optional(),
+  imageSize: z.enum(["512", "1K", "2K", "4K"]).optional(),
   quality: z.string().optional(),
   background: z.string().optional(),
   count: z.number().int().min(1).max(4).optional(),
@@ -78,6 +78,31 @@ const seedreamSupportedSizes = Object.keys(seedreamSizeMatrix);
 const seedreamSupportedAspectRatios = [
   ...new Set(Object.values(seedreamSizeMatrix).map((value) => value.aspectRatio)),
 ];
+export const geminiSupportedAspectRatios = [
+  "1:1",
+  "1:4",
+  "1:8",
+  "2:3",
+  "3:2",
+  "3:4",
+  "4:1",
+  "4:3",
+  "4:5",
+  "5:4",
+  "8:1",
+  "9:16",
+  "16:9",
+  "21:9",
+] as const;
+export const geminiSupportedImageSizes = ["512", "1K", "2K", "4K"] as const;
+export const openAiSupportedImageSizes = [
+  "1024x1024",
+  "1536x1024",
+  "1024x1536",
+  "auto",
+] as const;
+export const openAiSupportedOutputFormats = ["png", "webp", "jpeg"] as const;
+export const seedreamSupportedPixelSizes = seedreamSupportedSizes;
 
 function readEnv(key: string) {
   const value = process.env[key];
@@ -130,6 +155,11 @@ async function readError(response: Response) {
 async function generateWithOpenAI(input: GenerateImageInput): Promise<ImageResult> {
   const apiKey = assertEnv("OPENAI_API_KEY");
   const model = input.model || readEnv("OPENAI_IMAGE_MODEL") || "gpt-image-1.5";
+  if (input.size && !openAiSupportedImageSizes.includes(input.size as (typeof openAiSupportedImageSizes)[number])) {
+    throw new Error(
+      `Unsupported OpenAI image size: ${input.size}. Supported sizes: ${openAiSupportedImageSizes.join(", ")}`,
+    );
+  }
 
   const response = await fetch("https://api.openai.com/v1/images/generations", {
     method: "POST",
@@ -172,6 +202,11 @@ async function generateWithOpenAI(input: GenerateImageInput): Promise<ImageResul
 async function editWithOpenAI(input: EditImageInput): Promise<ImageResult> {
   const apiKey = assertEnv("OPENAI_API_KEY");
   const model = readEnv("OPENAI_IMAGE_MODEL") || "gpt-image-1.5";
+  if (input.size && !openAiSupportedImageSizes.includes(input.size as (typeof openAiSupportedImageSizes)[number])) {
+    throw new Error(
+      `Unsupported OpenAI image size: ${input.size}. Supported sizes: ${openAiSupportedImageSizes.join(", ")}`,
+    );
+  }
   const image = dataUrlToBlob(input.image);
   const mask = input.mask ? dataUrlToBlob(input.mask) : null;
   const form = new FormData();
@@ -241,6 +276,16 @@ async function generateWithGemini(input: GenerateImageInput): Promise<ImageResul
   const model = supportedModels.includes(requestedModel)
     ? requestedModel
     : supportedModels[0];
+  if (input.aspectRatio && !geminiSupportedAspectRatios.includes(input.aspectRatio as (typeof geminiSupportedAspectRatios)[number])) {
+    throw new Error(
+      `Unsupported Gemini aspect ratio: ${input.aspectRatio}. Supported ratios: ${geminiSupportedAspectRatios.join(", ")}`,
+    );
+  }
+  if (input.imageSize && !geminiSupportedImageSizes.includes(input.imageSize)) {
+    throw new Error(
+      `Unsupported Gemini image size: ${input.imageSize}. Supported sizes: ${geminiSupportedImageSizes.join(", ")}`,
+    );
+  }
   const parts: GeminiPart[] = [{ text: input.prompt }];
 
   for (const image of input.referenceImages ?? []) {
@@ -396,6 +441,8 @@ export function getImageProviderStatuses(): ImageProviderStatus[] {
       model:
         readEnv("GEMINI_IMAGE_MODEL") || "gemini-3.1-flash-image-preview",
       availableModels: geminiModels,
+      supportedAspectRatios: [...geminiSupportedAspectRatios],
+      supportedSizes: [...geminiSupportedImageSizes],
       ready: Boolean(readEnv("GEMINI_API_KEY")),
       capabilities: ["generate"],
       missingEnv: readEnv("GEMINI_API_KEY") ? [] : ["GEMINI_API_KEY"],
@@ -406,6 +453,7 @@ export function getImageProviderStatuses(): ImageProviderStatus[] {
       id: "openai",
       label: "OpenAI",
       model: readEnv("OPENAI_IMAGE_MODEL") || "gpt-image-1.5",
+      supportedSizes: [...openAiSupportedImageSizes],
       ready: Boolean(readEnv("OPENAI_API_KEY")),
       capabilities: ["generate", "edit"],
       missingEnv: readEnv("OPENAI_API_KEY") ? [] : ["OPENAI_API_KEY"],

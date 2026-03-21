@@ -1,31 +1,10 @@
 import Link from "next/link";
 import { Panel } from "@/components/panel";
+import { listCampaignsFromConvex } from "@/lib/convex-server";
 
-const campaigns = [
-  {
-    name: "Architect Awareness",
-    stage: "Brief Approved",
-    objective: "Awareness",
-    platforms: "Instagram / Pinterest",
-    focus: "The Architect collection",
-  },
-  {
-    name: "Spring Conversion Push",
-    stage: "Generating Variants",
-    objective: "Sales",
-    platforms: "Facebook / Instagram",
-    focus: "Polarized hero products",
-  },
-  {
-    name: "TikTok Launch Storyboard",
-    stage: "Review",
-    objective: "Launch",
-    platforms: "TikTok",
-    focus: "New collection reveal",
-  },
-];
+export default async function CampaignsPage() {
+  const campaigns = await listCampaignsFromConvex(20).catch(() => []);
 
-export default function CampaignsPage() {
   return (
     <div className="px-5 py-5 sm:px-8 lg:px-10">
       <div className="grid gap-4">
@@ -57,9 +36,15 @@ export default function CampaignsPage() {
             description="In the implemented product, this becomes a filterable data table or kanban view."
           >
             <div className="mt-6 grid gap-3">
+              {campaigns.length === 0 ? (
+                <div className="rounded-[24px] border border-dashed border-white/10 px-4 py-8 text-sm text-[var(--color-soft)]">
+                  No campaigns exist yet. The Convex campaign table is ready, and
+                  the next step is wiring the create flow to `campaigns.create`.
+                </div>
+              ) : null}
               {campaigns.map((campaign) => (
                 <div
-                  key={campaign.name}
+                  key={campaign._id}
                   className="rounded-[24px] border border-white/6 bg-black/18 p-4"
                 >
                   <div className="flex flex-wrap items-center justify-between gap-3">
@@ -67,7 +52,7 @@ export default function CampaignsPage() {
                       {campaign.name}
                     </h3>
                     <span className="rounded-full border border-[var(--color-orange)]/25 bg-[var(--color-orange-soft)] px-3 py-1 text-xs font-bold uppercase tracking-[0.16em] text-[var(--color-orange)]">
-                      {campaign.stage}
+                      {campaign.status}
                     </span>
                   </div>
                   <div className="mt-4 grid gap-3 text-sm text-[var(--color-soft)] sm:grid-cols-3">
@@ -77,11 +62,13 @@ export default function CampaignsPage() {
                     </div>
                     <div>
                       <div className="eyebrow">Platforms</div>
-                      <div className="mt-2 text-white/88">{campaign.platforms}</div>
+                      <div className="mt-2 text-white/88">
+                        {campaign.platformMix.join(" / ")}
+                      </div>
                     </div>
                     <div>
-                      <div className="eyebrow">Product Focus</div>
-                      <div className="mt-2 text-white/88">{campaign.focus}</div>
+                      <div className="eyebrow">Locale</div>
+                      <div className="mt-2 text-white/88">{campaign.locale}</div>
                     </div>
                   </div>
                 </div>

@@ -33,8 +33,10 @@ Open [http://localhost:3000](http://localhost:3000).
 
 ## Docs
 
+- `docs/backend-foundation.md`
 - `docs/campaign-studio-plan.md`
 - `docs/image-provider-integration.md`
+- `docs/implementation-task-list.md`
 - `docs/wireframes-and-route-map.md`
 - `docs/platform-setup.md`
 
@@ -53,3 +55,11 @@ cp .env.example .env.local
 ```
 
 The local `.env.local` in this repo already includes the Vanpella feed URL and placeholders for the remaining services.
+
+## Verification
+
+```bash
+npm run lint
+npm test
+npm run typecheck
+```
