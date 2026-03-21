@@ -27,8 +27,10 @@ export default async function CampaignDetailPage({
   const assets = detail.assets;
   const products = detail.products;
   const personas = detail.personas;
+  const generationJobs = detail.generationJobs;
   const heroAsset = assets[0];
   const secondaryAssets = assets.slice(1, 6);
+  const personaById = new Map(personas.map((persona) => [persona._id, persona.name]));
 
   return (
     <div className="mx-auto max-w-[1760px] px-5 pb-32 pt-6 sm:px-7 lg:px-9">
@@ -87,6 +89,85 @@ export default async function CampaignDetailPage({
                 ))}
               </div>
             )}
+
+            <div className="rounded-[28px] border border-white/6 bg-white/[0.018] px-5 py-5">
+              <div className="flex items-center justify-between gap-3">
+                <div className="text-[11px] uppercase tracking-[0.22em] text-white/28">
+                  Generation history
+                </div>
+                <div className="text-[11px] uppercase tracking-[0.18em] text-white/24">
+                  {generationJobs.length} jobs
+                </div>
+              </div>
+
+              <div className="mt-4 grid gap-3">
+                {generationJobs.slice(0, 6).map((job) => {
+                  const promptSpec = readPromptSpec(job.promptSpec);
+                  const cueTags = promptSpec?.referenceCues ?? [];
+                  const uploadedReferences = promptSpec?.uploadedReferences ?? [];
+                  const personaName = job.personaId
+                    ? personaById.get(job.personaId) || "Persona"
+                    : null;
+
+                  return (
+                    <article
+                      key={job._id}
+                      className="rounded-[22px] border border-white/6 bg-black/14 px-4 py-4"
+                    >
+                      <div className="flex flex-wrap items-start justify-between gap-3">
+                        <div>
+                          <div className="text-sm font-medium text-white/88">
+                            {job.provider} / {job.model}
+                          </div>
+                          <div className="mt-2 flex flex-wrap gap-2 text-[11px] uppercase tracking-[0.16em] text-white/30">
+                            {job.useCase ? <MiniChip>{job.useCase}</MiniChip> : null}
+                            {personaName ? <MiniChip>{personaName}</MiniChip> : null}
+                            <MiniChip>{job.status}</MiniChip>
+                          </div>
+                        </div>
+                        <div className="text-[11px] uppercase tracking-[0.18em] text-white/24">
+                          {new Date(job.createdAt).toLocaleDateString()}
+                        </div>
+                      </div>
+
+                      {cueTags.length > 0 ? (
+                        <div className="mt-4">
+                          <div className="text-[11px] uppercase tracking-[0.18em] text-white/24">
+                            Prompt cues
+                          </div>
+                          <div className="mt-2 flex flex-wrap gap-2">
+                            {cueTags.map((cue) => (
+                              <MiniChip key={cue}>{cue}</MiniChip>
+                            ))}
+                          </div>
+                        </div>
+                      ) : null}
+
+                      {uploadedReferences.length > 0 ? (
+                        <div className="mt-4">
+                          <div className="text-[11px] uppercase tracking-[0.18em] text-white/24">
+                            Uploaded references
+                          </div>
+                          <div className="mt-2 flex flex-wrap gap-2">
+                            {uploadedReferences.map((reference) => (
+                              <a
+                                key={reference.publicUrl}
+                                href={reference.publicUrl}
+                                target="_blank"
+                                rel="noreferrer"
+                                className="rounded-full border border-white/7 px-3 py-1 text-[11px] text-white/62 transition hover:border-white/14 hover:text-white"
+                              >
+                                {reference.name}
+                              </a>
+                            ))}
+                          </div>
+                        </div>
+                      ) : null}
+                    </article>
+                  );
+                })}
+              </div>
+            </div>
           </section>
 
           <aside className="grid gap-4 xl:pt-1">
@@ -355,4 +436,52 @@ function Chip({ children }: { children: React.ReactNode }) {
   return (
     <span className="rounded-full border border-white/7 px-3 py-1.5">{children}</span>
   );
+}
+
+function MiniChip({ children }: { children: React.ReactNode }) {
+  return (
+    <span className="rounded-full border border-white/7 px-3 py-1 text-[11px] uppercase tracking-[0.16em] text-white/34">
+      {children}
+    </span>
+  );
+}
+
+function readPromptSpec(value: unknown):
+  | {
+      referenceCues?: string[];
+      uploadedReferences?: Array<{ name: string; publicUrl: string }>;
+    }
+  | null {
+  if (!value || typeof value !== "object") {
+    return null;
+  }
+
+  const candidate = value as {
+    referenceCues?: unknown;
+    uploadedReferences?: unknown;
+  };
+
+  return {
+    referenceCues: Array.isArray(candidate.referenceCues)
+      ? candidate.referenceCues.filter(
+          (entry): entry is string => typeof entry === "string",
+        )
+      : [],
+    uploadedReferences: Array.isArray(candidate.uploadedReferences)
+      ? candidate.uploadedReferences.filter(
+          (
+            entry,
+          ): entry is {
+            name: string;
+            publicUrl: string;
+          } =>
+            typeof entry === "object" &&
+            entry !== null &&
+            "name" in entry &&
+            "publicUrl" in entry &&
+            typeof entry.name === "string" &&
+            typeof entry.publicUrl === "string",
+        )
+      : [],
+  };
 }

@@ -46,6 +46,7 @@ Date: March 21, 2026
 - [ ] Add approval and export states for assets.
 - [x] Add campaign detail read model for brief + jobs + assets.
 - [x] Add review board UI backed by Convex queries.
+- [x] Expose prompt metadata, persona linkage, and uploaded reference cues in campaign job history.
 
 ### UI Polish
 

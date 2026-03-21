@@ -75,6 +75,7 @@ Behavior:
 - generation jobs can now store `useCase`, `personaId`, and prompt metadata
 - persona-editorial generations can automatically update the persona reference image for later try-on use
 - uploaded reference images can be added from the computer, uploaded to R2, and analyzed into prompt cues
+- the campaign detail screen now exposes job-level prompt influence, including persona linkage, uploaded references, and extracted cue tags
 - `/campaigns/[campaignId]` reads the full campaign detail model from Convex
 - generation creates a job record, runs the chosen provider, uploads the image to R2, then stores the asset record in Convex
 - failed generations are written back to `generationJobs.errorMessage`
