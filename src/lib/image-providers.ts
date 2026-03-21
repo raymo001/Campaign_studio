@@ -11,6 +11,7 @@ const dataUrlSchema = z.string().startsWith("data:image/");
 export const generateImageSchema = z.object({
   provider: imageProviderSchema,
   prompt: z.string().min(1).max(4000),
+  model: z.string().min(1).max(200).optional(),
   size: sizeSchema,
   aspectRatio: aspectRatioSchema,
   imageSize: z.enum(["0.5K", "1K", "2K", "4K"]).optional(),
@@ -36,6 +37,7 @@ export type ImageProviderStatus = {
   id: ImageProviderId;
   label: string;
   model: string;
+  availableModels?: string[];
   ready: boolean;
   capabilities: Array<"generate" | "edit">;
   missingEnv: string[];
@@ -64,6 +66,18 @@ function assertEnv(key: string) {
   return value;
 }
 
+function readListEnv(key: string, fallback: string[]) {
+  const value = readEnv(key);
+  if (!value) {
+    return fallback;
+  }
+
+  return value
+    .split(",")
+    .map((item) => item.trim())
+    .filter(Boolean);
+}
+
 function dataUrlToBlob(dataUrl: string) {
   const match = dataUrl.match(/^data:(image\/[a-zA-Z0-9.+-]+);base64,(.+)$/);
   if (!match) {
@@ -89,7 +103,7 @@ async function readError(response: Response) {
 
 async function generateWithOpenAI(input: GenerateImageInput): Promise<ImageResult> {
   const apiKey = assertEnv("OPENAI_API_KEY");
-  const model = readEnv("OPENAI_IMAGE_MODEL") || "gpt-image-1.5";
+  const model = input.model || readEnv("OPENAI_IMAGE_MODEL") || "gpt-image-1.5";
 
   const response = await fetch("https://api.openai.com/v1/images/generations", {
     method: "POST",
@@ -195,8 +209,12 @@ type GeminiPart = {
 
 async function generateWithGemini(input: GenerateImageInput): Promise<ImageResult> {
   const apiKey = assertEnv("GEMINI_API_KEY");
-  const model =
-    readEnv("GEMINI_IMAGE_MODEL") || "gemini-3.1-flash-image-preview";
+  const supportedModels = getGeminiImageModels();
+  const requestedModel =
+    input.model || readEnv("GEMINI_IMAGE_MODEL") || "gemini-3.1-flash-image-preview";
+  const model = supportedModels.includes(requestedModel)
+    ? requestedModel
+    : supportedModels[0];
   const parts: GeminiPart[] = [{ text: input.prompt }];
 
   for (const image of input.referenceImages ?? []) {
@@ -293,7 +311,8 @@ async function generateWithSeedream(
   input: GenerateImageInput,
 ): Promise<ImageResult> {
   const apiKey = assertEnv("ARK_API_KEY");
-  const model = readEnv("SEEDREAM_IMAGE_MODEL") || "seedream-4-5-251128";
+  const model =
+    input.model || readEnv("SEEDREAM_IMAGE_MODEL") || "seedream-4-5-251128";
   const configuredBase =
     readEnv("SEEDREAM_API_BASE_URL") ||
     "https://ark.ap-southeast.bytepluses.com/api/v3";
@@ -336,15 +355,19 @@ async function generateWithSeedream(
 }
 
 export function getImageProviderStatuses(): ImageProviderStatus[] {
+  const geminiModels = getGeminiImageModels();
   const statuses: ImageProviderStatus[] = [
     {
       id: "gemini",
       label: "Google Gemini",
       model:
         readEnv("GEMINI_IMAGE_MODEL") || "gemini-3.1-flash-image-preview",
+      availableModels: geminiModels,
       ready: Boolean(readEnv("GEMINI_API_KEY")),
       capabilities: ["generate"],
       missingEnv: readEnv("GEMINI_API_KEY") ? [] : ["GEMINI_API_KEY"],
+      notes:
+        "Nano Banana 2 maps to gemini-3.1-flash-image-preview. Nano Banana Pro maps to gemini-3-pro-image-preview.",
     },
     {
       id: "openai",
@@ -384,4 +407,11 @@ export async function generateImage(
 
 export async function editImage(input: EditImageInput): Promise<ImageResult> {
   return editWithOpenAI(input);
+}
+
+export function getGeminiImageModels() {
+  return readListEnv("GEMINI_IMAGE_MODELS", [
+    "gemini-3.1-flash-image-preview",
+    "gemini-3-pro-image-preview",
+  ]);
 }

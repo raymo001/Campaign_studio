@@ -8,6 +8,18 @@ Date: March 21, 2026
 - OpenAI image generation and edits via `OPENAI_API_KEY` and `OPENAI_IMAGE_MODEL`
 - Seedream image generation via `ARK_API_KEY` and `SEEDREAM_IMAGE_MODEL`
 
+## Gemini Model Options
+
+The Gemini provider now exposes both of the current Nano Banana preview image models:
+
+- Nano Banana 2: `gemini-3.1-flash-image-preview`
+- Nano Banana Pro: `gemini-3-pro-image-preview`
+
+You can control the Gemini catalog with:
+
+- `GEMINI_IMAGE_MODEL`
+- `GEMINI_IMAGE_MODELS`
+
 ## Server Routes
 
 - `GET /api/image-providers`
@@ -21,6 +33,7 @@ Date: March 21, 2026
 ```json
 {
   "provider": "gemini",
+  "model": "gemini-3-pro-image-preview",
   "prompt": "Luxury editorial product shot of black acetate sunglasses on stone",
   "aspectRatio": "4:5",
   "imageSize": "2K"
@@ -58,7 +71,7 @@ Date: March 21, 2026
 ## Notes
 
 - OpenAI edits are wired only for OpenAI because that is the provider you explicitly asked to support for editing.
-- Gemini generation uses the configured model string directly and supports optional reference images.
+- Gemini generation supports explicit model selection per request and optional reference images.
 - Seedream generation now follows the BytePlus ModelArk OpenAI-compatible base URL shape: `https://ark.ap-southeast.bytepluses.com/api/v3/images/generations`.
 - BytePlus documents that `model` can be an endpoint ID or a model ID. If `seedream-4-5-251128` is rejected, use the deployed endpoint ID or the exact model ID from your BytePlus console.
 

@@ -122,6 +122,18 @@ export default function SettingsPage() {
                     </span>
                   ))}
                 </div>
+                {provider.availableModels?.length ? (
+                  <div className="mt-4 grid gap-2">
+                    {provider.availableModels.map((model) => (
+                      <div
+                        key={model}
+                        className="rounded-2xl border border-white/8 bg-white/3 px-3 py-2 text-xs tracking-[0.08em] text-white/85"
+                      >
+                        {model}
+                      </div>
+                    ))}
+                  </div>
+                ) : null}
                 {provider.missingEnv.length > 0 ? (
                   <p className="mt-4 text-sm leading-6 text-[var(--color-soft)]">
                     Missing: {provider.missingEnv.join(", ")}
