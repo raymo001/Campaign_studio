@@ -56,6 +56,7 @@ These provide server-side helpers for:
 Files:
 
 - [src/lib/campaigns.ts](/Users/biatyraymond/Documents/Campaign_Studio/src/lib/campaigns.ts)
+- [src/lib/prompt-system.ts](/Users/biatyraymond/Documents/Campaign_Studio/src/lib/prompt-system.ts)
 - [src/lib/generation-workflow.ts](/Users/biatyraymond/Documents/Campaign_Studio/src/lib/generation-workflow.ts)
 - [src/lib/r2.ts](/Users/biatyraymond/Documents/Campaign_Studio/src/lib/r2.ts)
 - [src/app/campaigns/actions.ts](/Users/biatyraymond/Documents/Campaign_Studio/src/app/campaigns/actions.ts)
@@ -65,6 +66,8 @@ Behavior:
 
 - `/campaigns/new` now creates a campaign plus its first structured brief
 - the brief is generated from synced product data and campaign inputs
+- generation now builds an internal prompt spec before rendering a provider-specific prompt
+- the prompt system supports product highlight, try-on, and persona-editorial use cases
 - `/campaigns/[campaignId]` reads the full campaign detail model from Convex
 - generation creates a job record, runs the chosen provider, uploads the image to R2, then stores the asset record in Convex
 - failed generations are written back to `generationJobs.errorMessage`

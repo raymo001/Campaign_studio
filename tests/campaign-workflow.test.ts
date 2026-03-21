@@ -4,6 +4,7 @@ import {
   buildCampaignBrief,
   buildImagePrompt,
 } from "@/lib/campaigns";
+import { buildInternalPromptSpec } from "@/lib/prompt-system";
 import {
   buildGeneratedAssetKey,
   buildR2PublicUrl,
@@ -91,6 +92,7 @@ test("buildImagePrompt includes platform, product, and quality guardrails", () =
   );
 
   const prompt = buildImagePrompt({
+    provider: "gemini",
     campaign: {
       name: "Launch drop",
       objective: "Launch",
@@ -101,14 +103,85 @@ test("buildImagePrompt includes platform, product, and quality guardrails", () =
     },
     brief,
     products: [sampleProduct],
+    imageSize: "2K",
     aspectRatio: "2:3",
   });
 
   assert.match(prompt, /Vanpella/i);
   assert.match(prompt, /Pinterest/);
   assert.match(prompt, /The Architect Ink/);
-  assert.match(prompt, /Avoid distorted eyewear geometry/);
-  assert.match(prompt, /Aspect ratio target: 2:3/);
+  assert.match(prompt, /Constraints:/);
+  assert.match(prompt, /Aspect ratio: 2:3/);
+});
+
+test("internal prompt spec supports try-on and preserves fit constraints", () => {
+  const brief = buildCampaignBrief(
+    {
+      name: "Try-on fit test",
+      objective: "Consideration",
+      primaryPlatform: "Instagram",
+      platformMix: ["Instagram"],
+      locale: "en-US",
+      productSkus: [sampleProduct.sku],
+    },
+    [sampleProduct],
+  );
+
+  const spec = buildInternalPromptSpec({
+    campaign: {
+      objective: "Consideration",
+      primaryPlatform: "Instagram",
+      locale: "en-US",
+    },
+    brief,
+    products: [sampleProduct],
+    useCase: "try-on",
+    aspectRatio: "4:5",
+  });
+
+  assert.equal(spec.useCase, "try-on");
+  assert.match(spec.subject, /model wearing/i);
+  assert.ok(
+    spec.constraints.some((constraint) => /physically plausible/i.test(constraint)),
+  );
+  assert.ok(
+    spec.negativeAvoidance.some((value) => /identity drift/i.test(value)),
+  );
+});
+
+test("openai prompt renderer uses labeled sections for controlled generation", () => {
+  const brief = buildCampaignBrief(
+    {
+      name: "Persona launch",
+      objective: "Launch",
+      primaryPlatform: "Instagram",
+      platformMix: ["Instagram"],
+      locale: "en-US",
+      productSkus: [sampleProduct.sku],
+    },
+    [sampleProduct],
+  );
+
+  const prompt = buildImagePrompt({
+    provider: "openai",
+    campaign: {
+      name: "Persona launch",
+      objective: "Launch",
+      primaryPlatform: "Instagram",
+      platformMix: ["Instagram"],
+      locale: "en-US",
+      productSkus: [sampleProduct.sku],
+    },
+    brief,
+    products: [sampleProduct],
+    useCase: "persona-editorial",
+    aspectRatio: "4:5",
+  });
+
+  assert.match(prompt, /^Task:/);
+  assert.match(prompt, /Scene:/);
+  assert.match(prompt, /Constraints:/);
+  assert.match(prompt, /Do not:/);
 });
 
 test("R2 helpers build stable keys, URLs, and file extensions", () => {

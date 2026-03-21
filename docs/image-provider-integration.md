@@ -74,6 +74,7 @@ You can control the Gemini catalog with:
 - Gemini generation supports explicit model selection per request and optional reference images.
 - Seedream generation now follows the BytePlus ModelArk OpenAI-compatible base URL shape: `https://ark.ap-southeast.bytepluses.com/api/v3/images/generations`.
 - BytePlus documents that `model` can be an endpoint ID or a model ID. If `seedream-4-5-251128` is rejected, use the deployed endpoint ID or the exact model ID from your BytePlus console.
+- Provider prompts are now rendered from a shared internal prompt spec defined in [prompt-system.md](/Users/biatyraymond/Documents/Campaign_Studio/docs/prompt-system.md).
 
 ### Seedream 4.5 validated size matrix
 

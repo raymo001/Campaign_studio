@@ -52,6 +52,7 @@ export async function runCampaignImageGeneration(input: GenerationRequest) {
     );
 
   const prompt = buildImagePrompt({
+    provider: input.provider,
     campaign: {
       name: campaign.name,
       objective: campaign.objective,
@@ -63,7 +64,9 @@ export async function runCampaignImageGeneration(input: GenerationRequest) {
     },
     brief: latestBrief,
     products,
+    imageSize: input.imageSize,
     aspectRatio: input.aspectRatio,
+    size: input.size,
   });
 
   const requestedModel = input.model || defaultModelForProvider(input.provider);

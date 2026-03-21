@@ -1,4 +1,10 @@
 import type { NormalizedProduct } from "@/lib/feed";
+import {
+  buildInternalPromptSpec,
+  renderPromptForProvider,
+  type PromptUseCase,
+} from "@/lib/prompt-system";
+import type { ImageProviderId } from "@/lib/image-providers";
 
 type CampaignSeed = {
   name: string;
@@ -20,6 +26,7 @@ type CampaignBriefProduct = Pick<
   | "retailPrice"
   | "referenceImages"
   | "productImages"
+  | "tryOnImages"
   | "descriptions"
   | "promptContext"
 >;
@@ -135,42 +142,31 @@ export function buildCampaignBrief(
 }
 
 export function buildImagePrompt(args: {
+  provider: ImageProviderId;
   campaign: CampaignSeed;
   brief: ReturnType<typeof buildCampaignBrief>;
   products: CampaignBriefProduct[];
+  useCase?: PromptUseCase;
   aspectRatio?: string;
+  imageSize?: string;
+  size?: string;
 }) {
-  const primary = args.products[0];
-  const productBlock = args.products
-    .map((product) => {
-      const details = uniqueValues([
-        product.promptContext.frameMaterial,
-        product.promptContext.frameShape,
-        product.promptContext.frameColor,
-        product.promptContext.lensColor,
-      ]);
-      return `${product.name}${details.length ? ` (${details.join(", ")})` : ""}`;
-    })
-    .join("; ");
+  const spec = buildInternalPromptSpec({
+    campaign: {
+      objective: args.campaign.objective,
+      primaryPlatform: args.campaign.primaryPlatform,
+      locale: args.campaign.locale,
+      audienceAngle: args.brief.audienceAngle,
+    },
+    brief: args.brief,
+    products: args.products,
+    useCase: args.useCase,
+    aspectRatio: args.aspectRatio,
+    imageSize: args.imageSize,
+    size: args.size,
+  });
 
-  return [
-    `Create a premium ecommerce campaign image for Vanpella.`,
-    `Objective: ${args.campaign.objective}.`,
-    `Platform priority: ${args.campaign.primaryPlatform}, with supporting placements for ${args.campaign.platformMix.join(", ")}.`,
-    `Audience: ${args.brief.audienceAngle}.`,
-    `Featured products: ${productBlock}.`,
-    `Visual style: ${args.brief.creativeDirection.visualStyle}`,
-    `Lighting: ${args.brief.creativeDirection.lighting}.`,
-    `Composition rules: ${args.brief.creativeDirection.compositionRules.join(" ")}`,
-    `Avoid distorted eyewear geometry, extra limbs, unreadable product details, or busy backgrounds.`,
-    primary?.descriptions.socialCaption
-      ? `Brand tone reference: ${primary.descriptions.socialCaption}.`
-      : undefined,
-    args.aspectRatio ? `Aspect ratio target: ${args.aspectRatio}.` : undefined,
-    `Call to action direction: ${args.brief.copyDirection.callToAction}.`,
-  ]
-    .filter(Boolean)
-    .join(" ");
+  return renderPromptForProvider(args.provider, spec);
 }
 
 function uniqueValues(values: Array<string | undefined>) {

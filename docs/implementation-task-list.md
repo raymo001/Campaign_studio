@@ -14,6 +14,7 @@ Date: March 21, 2026
 - [x] Document the new backend foundation.
 - [x] Clean the main UI routes and remove internal commentary from visible product copy.
 - [x] Add a dedicated `/tutorials` help route and keep guidance out of the main workflow surfaces.
+- [x] Add a provider-aware internal prompt system with support for product highlight, try-on, and persona-led generation.
 
 ## Next Build Slice
 
@@ -28,12 +29,14 @@ Date: March 21, 2026
 - [x] Wire `/campaigns/new` to `campaigns.create`.
 - [x] Add structured brief schema and persistence.
 - [ ] Create platform preset records and selection logic.
+- [ ] Add prompt use-case selection to campaign creation and generation controls.
 
 ### Generation Pipeline
 
 - [x] Persist generation jobs from the campaign generation workflow.
 - [x] Write generated image metadata to `assets`.
 - [x] Upload generated results to R2 and persist public URLs.
+- [ ] Persist internal prompt specs with generation jobs for audit and replay.
 
 ### Review System
 
