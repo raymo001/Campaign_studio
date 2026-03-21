@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 90 50" width="90" height="50">
+<defs><style>@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&amp;display=swap');</style></defs>
+
+<g transform="translate(5.3999999999999995, 12.399999999999999) scale(0.18000000000000002)">
+<path d="M20 20 L65 20 L20 65 Z" fill="#16473d"/>
+<path d="M75 20 L120 20 L120 65 Z" fill="#fe6816"/>
+<path d="M20 75 L20 120 L65 120 Z" fill="#16473d"/>
+<path d="M120 75 L120 120 L75 120 Z" fill="#16473d"/>
+</g>
+<text x="33.75" y="25.172372881355933" font-family="'Inter', sans-serif" font-weight="700" font-size="8.61864406779661" letter-spacing="0.6894915254237288" fill="#16473d">VANPELLA</text>
+<text x="33.75" y="29.522372881355935" font-family="'Inter', sans-serif" font-weight="400" font-size="3" letter-spacing="0.66" fill="#fe6816">PARIS</text>
+</svg>

@@ -1,0 +1,78 @@
+@import "tailwindcss";
+
+:root {
+  --color-app: #0c1110;
+  --color-panel: #121917;
+  --color-panel-strong: #17211e;
+  --color-panel-muted: #101614;
+  --color-border: rgba(255, 255, 255, 0.08);
+  --color-ink: #eef2ee;
+  --color-soft: #9ca9a0;
+  --color-green: #16473d;
+  --color-green-bright: #236454;
+  --color-orange: #fe6816;
+  --color-orange-soft: rgba(254, 104, 22, 0.12);
+  --radius-xl: 26px;
+}
+
+@theme inline {
+  --color-background: var(--color-app);
+  --color-foreground: var(--color-ink);
+  --font-sans: var(--font-sans);
+  --font-mono: ui-monospace, "SFMono-Regular", monospace;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  background:
+    radial-gradient(circle at top left, rgba(35, 100, 84, 0.16), transparent 32%),
+    linear-gradient(180deg, #0d1211 0%, #090c0b 100%);
+  color: var(--color-ink);
+  font-family: var(--font-sans), sans-serif;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+::selection {
+  background: rgba(254, 104, 22, 0.35);
+  color: white;
+}
+
+.display {
+  font-family: var(--font-display), serif;
+}
+
+.panel {
+  border: 1px solid var(--color-border);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0.015));
+  box-shadow: 0 28px 70px rgba(0, 0, 0, 0.24);
+}
+
+.panel-muted {
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.eyebrow {
+  color: var(--color-soft);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.divider {
+  border-color: var(--color-border);
+}
+
+.glow-ring {
+  box-shadow:
+    0 0 0 1px rgba(254, 104, 22, 0.2),
+    0 0 0 8px rgba(254, 104, 22, 0.06);
+}
