@@ -81,6 +81,7 @@ export async function generateCampaignImageAction(formData: FormData) {
   const aspectRatio = String(formData.get("aspectRatio") || "").trim();
   const imageSize = String(formData.get("imageSize") || "").trim();
   const size = String(formData.get("size") || "").trim();
+  const direction = String(formData.get("direction") || "").trim();
   const personaId = String(formData.get("personaId") || "").trim();
   const useCase = String(formData.get("useCase") || "product-highlight").trim();
   const uploadedReferences = await readImageFilesFromFormData(formData, "referenceFiles", 3);
@@ -102,6 +103,7 @@ export async function generateCampaignImageAction(formData: FormData) {
     useCase: promptUseCaseOptions.includes(useCase as (typeof promptUseCaseOptions)[number])
       ? (useCase as (typeof promptUseCaseOptions)[number])
       : "product-highlight",
+    direction: direction || undefined,
     uploadedReferences,
     aspectRatio: aspectRatio || undefined,
     imageSize: geminiSupportedImageSizes.includes(

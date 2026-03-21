@@ -55,6 +55,7 @@ export type InternalPromptSpec = {
   negativeAvoidance: string[];
   referenceCues: string[];
   references: PromptReferenceImage[];
+  userDirection?: string;
   persona?: {
     name: string;
     archetype?: string;
@@ -102,6 +103,7 @@ export function buildInternalPromptSpec(args: {
     referenceImageUrl?: string;
   };
   referenceCues?: string[];
+  userDirection?: string;
   useCase?: PromptUseCase;
   aspectRatio?: string;
   imageSize?: string;
@@ -150,6 +152,7 @@ export function buildInternalPromptSpec(args: {
     negativeAvoidance: buildNegativeAvoidance(useCase),
     referenceCues: args.referenceCues ?? [],
     references: buildReferences(useCase, args.products),
+    userDirection: args.userDirection,
     persona: args.persona,
   };
 
@@ -195,6 +198,7 @@ function renderGeminiPrompt(spec: InternalPromptSpec) {
     `Brand tone: ${spec.brandTone.join(" ")}.`,
     spec.persona ? `Persona: ${buildPersonaDescriptor(spec.persona)}.` : undefined,
     spec.referenceCues.length ? `Reference cues: ${spec.referenceCues.join(" ")}.` : undefined,
+    spec.userDirection ? `User direction: ${spec.userDirection}.` : undefined,
     spec.textOverlay?.headline ? `Headline text: ${spec.textOverlay.headline}.` : undefined,
     spec.textOverlay?.cta ? `CTA text: ${spec.textOverlay.cta}.` : undefined,
     spec.aspectRatio ? `Aspect ratio: ${spec.aspectRatio}.` : undefined,
@@ -221,6 +225,7 @@ function renderOpenAiPrompt(spec: InternalPromptSpec) {
     `Brand tone: ${spec.brandTone.join(" ")}.`,
     spec.persona ? `Persona: ${buildPersonaDescriptor(spec.persona)}.` : undefined,
     spec.referenceCues.length ? `Reference cues: ${spec.referenceCues.join(" ")}.` : undefined,
+    spec.userDirection ? `User direction: ${spec.userDirection}.` : undefined,
     spec.textOverlay?.headline ? `Text headline: ${spec.textOverlay.headline}.` : undefined,
     spec.textOverlay?.body ? `Text body: ${spec.textOverlay.body}.` : undefined,
     spec.textOverlay?.cta ? `Text CTA: ${spec.textOverlay.cta}.` : undefined,
@@ -239,6 +244,7 @@ function renderSeedreamPrompt(spec: InternalPromptSpec) {
     spec.subject,
     spec.persona ? buildPersonaDescriptor(spec.persona) : undefined,
     spec.referenceCues?.length ? spec.referenceCues.join(", ") : undefined,
+    spec.userDirection,
     spec.productFocus.join("; "),
     spec.setting,
     spec.actionOrPose,

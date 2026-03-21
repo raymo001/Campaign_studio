@@ -33,6 +33,7 @@ type GenerationRequest = Pick<
   campaignId: string;
   personaId?: string;
   useCase?: PromptUseCase;
+  direction?: string;
   uploadedReferences?: UploadedReferenceImage[];
 };
 
@@ -110,6 +111,7 @@ export async function runCampaignImageGeneration(input: GenerationRequest) {
         }
       : undefined,
     referenceCues: buildReferenceCueStrings(referenceAnalysis),
+    userDirection: input.direction,
     useCase: input.useCase,
     imageSize: input.imageSize,
     aspectRatio: input.aspectRatio,
@@ -120,6 +122,7 @@ export async function runCampaignImageGeneration(input: GenerationRequest) {
     useCase: input.useCase ?? "product-highlight",
     personaId: persona?._id,
     referenceCues: buildReferenceCueStrings(referenceAnalysis),
+    direction: input.direction,
     uploadedReferences: uploadedReferenceRecords,
   };
 

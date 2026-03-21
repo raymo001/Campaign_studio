@@ -1,15 +1,13 @@
 import Image from "next/image";
 import { notFound } from "next/navigation";
-import { generateCampaignImageAction } from "@/app/campaigns/actions";
+import { GenerationComposer } from "@/components/generation-composer";
 import { getCampaignDetailFromConvex } from "@/lib/convex-server";
 import {
   geminiSupportedAspectRatios,
   geminiSupportedImageSizes,
-  getGeminiImageModels,
   openAiSupportedImageSizes,
   seedreamSupportedPixelSizes,
 } from "@/lib/image-providers";
-import { promptUseCaseOptions } from "@/lib/prompt-system";
 
 export default async function CampaignDetailPage({
   params,
@@ -220,136 +218,23 @@ export default async function CampaignDetailPage({
         </main>
       </div>
 
-      <div className="fixed inset-x-0 bottom-4 z-30 flex justify-center px-4">
-        <form
-          action={generateCampaignImageAction}
-          className="w-full max-w-[960px] rounded-[30px] border border-white/7 bg-[rgba(16,18,17,0.94)] p-4 shadow-[0_30px_90px_rgba(0,0,0,0.45)] backdrop-blur-xl"
-        >
-          <input type="hidden" name="campaignId" value={detail.campaign._id} />
-
-          <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end">
-            <div className="grid gap-3">
-              <div className="text-base leading-7 text-white/78">
-                {latestBrief?.copyDirection?.hook ||
-                  "Render the next campaign variant from the saved brief."}
-              </div>
-              <div className="text-sm text-white/38">
-                Add reference images to guide styling, composition, or persona context. Uploaded images are tagged automatically and folded into the prompt.
-              </div>
-
-              <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-6">
-                <ComposerField>
-                  <select
-                    name="useCase"
-                    defaultValue="product-highlight"
-                    className="h-11 rounded-[16px] border border-white/8 bg-black/18 px-3 text-sm text-white outline-none"
-                  >
-                    {promptUseCaseOptions.map((option) => (
-                      <option key={option} value={option} className="bg-[var(--color-panel)]">
-                        {option}
-                      </option>
-                    ))}
-                  </select>
-                </ComposerField>
-
-                <ComposerField>
-                  <select
-                    name="provider"
-                    defaultValue="gemini"
-                    className="h-11 rounded-[16px] border border-white/8 bg-black/18 px-3 text-sm text-white outline-none"
-                  >
-                    <option value="gemini" className="bg-[var(--color-panel)]">Gemini</option>
-                    <option value="openai" className="bg-[var(--color-panel)]">OpenAI</option>
-                    <option value="seedream" className="bg-[var(--color-panel)]">Seedream</option>
-                  </select>
-                </ComposerField>
-
-                <ComposerField>
-                  <select
-                    name="personaId"
-                    defaultValue=""
-                    className="h-11 rounded-[16px] border border-white/8 bg-black/18 px-3 text-sm text-white outline-none"
-                  >
-                    <option value="" className="bg-[var(--color-panel)]">
-                      No persona
-                    </option>
-                    {personas.map((persona) => (
-                      <option
-                        key={persona._id}
-                        value={persona._id}
-                        className="bg-[var(--color-panel)]"
-                      >
-                        {persona.name}
-                      </option>
-                    ))}
-                  </select>
-                </ComposerField>
-
-                <ComposerField>
-                  <input
-                    name="model"
-                    placeholder={getGeminiImageModels()[0]}
-                    className="h-11 rounded-[16px] border border-white/8 bg-black/18 px-3 text-sm text-white outline-none"
-                  />
-                </ComposerField>
-
-                <ComposerField>
-                  <select
-                    name="aspectRatio"
-                    defaultValue={latestBrief?.generationDefaults?.aspectRatio || "4:5"}
-                    className="h-11 rounded-[16px] border border-white/8 bg-black/18 px-3 text-sm text-white outline-none"
-                  >
-                    {geminiSupportedAspectRatios.map((ratio) => (
-                      <option key={ratio} value={ratio} className="bg-[var(--color-panel)]">
-                        {ratio}
-                      </option>
-                    ))}
-                  </select>
-                </ComposerField>
-
-                <ComposerField>
-                  <select
-                    name="imageSize"
-                    defaultValue={latestBrief?.generationDefaults?.imageSize || "2K"}
-                    className="h-11 rounded-[16px] border border-white/8 bg-black/18 px-3 text-sm text-white outline-none"
-                  >
-                    {geminiSupportedImageSizes.map((size) => (
-                      <option key={size} value={size} className="bg-[var(--color-panel)]">
-                        {size}
-                      </option>
-                    ))}
-                  </select>
-                </ComposerField>
-
-                <ComposerField>
-                  <input
-                    name="size"
-                    placeholder={`${openAiSupportedImageSizes[0]} / ${seedreamSupportedPixelSizes[0]}`}
-                    className="h-11 rounded-[16px] border border-white/8 bg-black/18 px-3 text-sm text-white outline-none"
-                  />
-                </ComposerField>
-              </div>
-
-              <div>
-                <input
-                  type="file"
-                  name="referenceFiles"
-                  accept="image/*"
-                  multiple
-                  className="block w-full rounded-[18px] border border-white/8 bg-black/18 px-4 py-3 text-sm text-white/72 file:mr-4 file:rounded-full file:border-0 file:bg-white/10 file:px-4 file:py-2 file:text-sm file:font-medium file:text-white"
-                />
-              </div>
-            </div>
-
-            <button
-              type="submit"
-              className="h-14 min-w-[184px] rounded-[20px] bg-[var(--color-orange)] px-6 text-base font-semibold text-white shadow-[0_18px_44px_rgba(254,104,22,0.28)] transition hover:brightness-105"
-            >
-              Create
-            </button>
-          </div>
-        </form>
-      </div>
+      <GenerationComposer
+        campaignId={detail.campaign._id}
+        defaultHook={
+          latestBrief?.copyDirection?.hook ||
+          "Render the next campaign variant from the saved brief."
+        }
+        defaultAspectRatio={latestBrief?.generationDefaults?.aspectRatio || "4:5"}
+        defaultImageSize={latestBrief?.generationDefaults?.imageSize || "2K"}
+        personas={personas.map((persona) => ({
+          id: persona._id,
+          name: persona.name,
+        }))}
+        geminiAspectRatios={geminiSupportedAspectRatios}
+        geminiImageSizes={geminiSupportedImageSizes}
+        openAiSizes={openAiSupportedImageSizes}
+        seedreamSizes={seedreamSupportedPixelSizes}
+      />
     </div>
   );
 }
@@ -422,14 +307,6 @@ function MetaBlock({
       <div className="mt-3 text-[15px] leading-7 text-white/76">{value || "Not set"}</div>
     </div>
   );
-}
-
-function ComposerField({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
-  return <div>{children}</div>;
 }
 
 function Chip({ children }: { children: React.ReactNode }) {

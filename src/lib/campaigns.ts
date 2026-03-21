@@ -156,6 +156,7 @@ export function buildImagePrompt(args: {
     referenceImageUrl?: string;
   };
   referenceCues?: string[];
+  userDirection?: string;
   useCase?: PromptUseCase;
   aspectRatio?: string;
   imageSize?: string;
@@ -172,6 +173,7 @@ export function buildImagePrompt(args: {
     products: args.products,
     persona: args.persona,
     referenceCues: args.referenceCues,
+    userDirection: args.userDirection,
     useCase: args.useCase,
     aspectRatio: args.aspectRatio,
     imageSize: args.imageSize,
