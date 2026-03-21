@@ -1,4 +1,17 @@
+import process from "node:process";
 import { PutBucketCorsCommand, S3Client } from "@aws-sdk/client-s3";
+
+// Load local env files when the script is run outside Next.js runtime.
+for (const envFile of [".env.local", ".env"]) {
+  try {
+    process.loadEnvFile?.(envFile);
+  } catch (error) {
+    if (error && typeof error === "object" && "code" in error && error.code === "ENOENT") {
+      continue;
+    }
+    throw error;
+  }
+}
 
 const required = [
   "CLOUDFLARE_ACCOUNT_ID",
