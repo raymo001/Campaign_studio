@@ -296,11 +296,8 @@ async function generateWithSeedream(
   const model = readEnv("SEEDREAM_IMAGE_MODEL") || "seedream-4-5-251128";
   const configuredBase =
     readEnv("SEEDREAM_API_BASE_URL") ||
-    "https://operator.las.cn-beijing.volces.com/api/v1";
-  const candidateUrls = [
-    `${configuredBase.replace(/\/$/, "")}/images/generations`,
-    `${configuredBase.replace(/\/$/, "")}/online/images/generations`,
-  ];
+    "https://ark.ap-southeast.bytepluses.com/api/v3";
+  const url = `${configuredBase.replace(/\/$/, "")}/images/generations`;
 
   const payload: Record<string, unknown> = {
     model,
@@ -315,29 +312,27 @@ async function generateWithSeedream(
     payload.image = input.referenceImages;
   }
 
-  let lastError = "";
-  for (const url of candidateUrls) {
-    try {
-      const response = await postSeedream(url, payload, apiKey);
-      const image = response.data?.[0];
+  try {
+    const response = await postSeedream(url, payload, apiKey);
+    const image = response.data?.[0];
 
-      if (!image) {
-        throw new Error("Seedream returned no image.");
-      }
-
-      return {
-        provider: "seedream",
-        model: response.model ?? model,
-        mimeType: "image/jpeg",
-        imageBase64: image.b64_json,
-        imageUrl: image.url,
-      };
-    } catch (error) {
-      lastError = error instanceof Error ? error.message : String(error);
+    if (!image) {
+      throw new Error("Seedream returned no image.");
     }
-  }
 
-  throw new Error(`Seedream image generation failed: ${lastError}`);
+    return {
+      provider: "seedream",
+      model: response.model ?? model,
+      mimeType: "image/jpeg",
+      imageBase64: image.b64_json,
+      imageUrl: image.url,
+    };
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    throw new Error(
+      `Seedream image generation failed: ${message}. Check whether SEEDREAM_IMAGE_MODEL is a valid ModelArk endpoint ID or model ID for your BytePlus account.`,
+    );
+  }
 }
 
 export function getImageProviderStatuses(): ImageProviderStatus[] {
@@ -361,13 +356,13 @@ export function getImageProviderStatuses(): ImageProviderStatus[] {
     },
     {
       id: "seedream",
-      label: "Seedream via Volcengine LAS / ARK key",
+      label: "Seedream via BytePlus ModelArk",
       model: readEnv("SEEDREAM_IMAGE_MODEL") || "seedream-4-5-251128",
       ready: Boolean(readEnv("ARK_API_KEY")),
       capabilities: ["generate"],
       missingEnv: readEnv("ARK_API_KEY") ? [] : ["ARK_API_KEY"],
       notes:
-        "Volcengine's docs currently show the documented model id with a doubao- prefix. This integration uses your env model string as configured.",
+        "BytePlus documents an OpenAI-compatible Ark base URL. Depending on your account setup, the model value may need to be a deployed endpoint ID rather than only a family name.",
     },
   ];
 

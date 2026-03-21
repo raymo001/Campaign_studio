@@ -59,11 +59,12 @@ Date: March 21, 2026
 
 - OpenAI edits are wired only for OpenAI because that is the provider you explicitly asked to support for editing.
 - Gemini generation uses the configured model string directly and supports optional reference images.
-- Seedream generation uses the configured model string directly and falls back between two LAS endpoint shapes because the current docs show both `/api/v1/images/generations` and `/api/v1/online/images/generations`.
-- Volcengine's current public docs show the documented Seedream 4.5 model id as `doubao-seedream-4-5-251128`. If your configured `seedream-4-5-251128` string is rejected by the API, switch the env value to the documented id.
+- Seedream generation now follows the BytePlus ModelArk OpenAI-compatible base URL shape: `https://ark.ap-southeast.bytepluses.com/api/v3/images/generations`.
+- BytePlus documents that `model` can be an endpoint ID or a model ID. If `seedream-4-5-251128` is rejected, use the deployed endpoint ID or the exact model ID from your BytePlus console.
 
 ## Sources
 
 - Gemini image generation: https://ai.google.dev/gemini-api/docs/image-generation
 - OpenAI image generation guide: https://platform.openai.com/docs/guides/image-generation
-- Volcengine Seedream image generation: https://www.volcengine.com/docs/6492/2172373?lang=zh
+- BytePlus image generation API: https://docs.byteplus.com/en/docs/ModelArk/1541523
+- BytePlus OpenAI compatibility: https://docs.byteplus.com/en/docs/ModelArk/1330626
