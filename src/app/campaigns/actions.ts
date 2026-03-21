@@ -12,6 +12,13 @@ import {
 import { runCampaignImageGeneration } from "@/lib/generation-workflow";
 import { geminiSupportedImageSizes } from "@/lib/image-providers";
 import { promptUseCaseOptions } from "@/lib/prompt-system";
+import { readImageFilesFromFormData } from "@/lib/reference-images";
+import {
+  buildPersonaReferenceKey,
+  inferFileExtension,
+  uploadAssetToR2,
+} from "@/lib/r2";
+import { attachPersonaReferenceImageInConvex } from "@/lib/convex-server";
 
 export async function createCampaignAction(formData: FormData) {
   const name = String(formData.get("name") || "").trim();
@@ -76,6 +83,7 @@ export async function generateCampaignImageAction(formData: FormData) {
   const size = String(formData.get("size") || "").trim();
   const personaId = String(formData.get("personaId") || "").trim();
   const useCase = String(formData.get("useCase") || "product-highlight").trim();
+  const uploadedReferences = await readImageFilesFromFormData(formData, "referenceFiles", 3);
 
   if (!campaignId || !provider) {
     throw new Error("Campaign and provider are required.");
@@ -94,6 +102,7 @@ export async function generateCampaignImageAction(formData: FormData) {
     useCase: promptUseCaseOptions.includes(useCase as (typeof promptUseCaseOptions)[number])
       ? (useCase as (typeof promptUseCaseOptions)[number])
       : "product-highlight",
+    uploadedReferences,
     aspectRatio: aspectRatio || undefined,
     imageSize: geminiSupportedImageSizes.includes(
       imageSize as (typeof geminiSupportedImageSizes)[number],
@@ -115,6 +124,7 @@ export async function createPersonaAction(formData: FormData) {
   const genderPresentation = String(formData.get("genderPresentation") || "").trim();
   const archetype = String(formData.get("archetype") || "").trim();
   const referenceImageUrl = String(formData.get("referenceImageUrl") || "").trim();
+  const referenceFile = await readImageFilesFromFormData(formData, "referenceFile", 1);
   const styleNotes = String(formData.get("styleNotes") || "")
     .split(",")
     .map((value) => value.trim())
@@ -128,7 +138,7 @@ export async function createPersonaAction(formData: FormData) {
     throw new Error("Persona name is required.");
   }
 
-  await createPersonaInConvex({
+  const personaId = await createPersonaInConvex({
     name,
     locale,
     ageBand: ageBand || undefined,
@@ -138,6 +148,25 @@ export async function createPersonaAction(formData: FormData) {
     physicalFeatures,
     referenceImageUrl: referenceImageUrl || undefined,
   });
+
+  if (referenceFile[0]) {
+    const image = referenceFile[0];
+    const extension = inferFileExtension(image.mimeType);
+    const key = buildPersonaReferenceKey({
+      personaId,
+      fileName: image.fileName,
+      extension,
+    });
+    const upload = await uploadAssetToR2({
+      key,
+      body: image.bytes,
+      contentType: image.mimeType,
+    });
+    await attachPersonaReferenceImageInConvex({
+      personaId,
+      referenceImageUrl: upload.publicUrl,
+    });
+  }
 
   revalidatePath("/personas");
   redirect("/personas");

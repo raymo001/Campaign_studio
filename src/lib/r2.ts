@@ -51,6 +51,26 @@ export function buildGeneratedAssetKey(args: {
   ].join("/");
 }
 
+export function buildPersonaReferenceKey(args: {
+  personaId: string;
+  fileName: string;
+  extension: string;
+}) {
+  const date = new Date().toISOString().slice(0, 10);
+  const safeName = args.fileName.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
+  return ["personas", args.personaId, "references", date, `${safeName || "reference"}.${args.extension}`].join("/");
+}
+
+export function buildCampaignReferenceKey(args: {
+  campaignId: string;
+  fileName: string;
+  extension: string;
+}) {
+  const date = new Date().toISOString().slice(0, 10);
+  const safeName = args.fileName.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
+  return ["campaigns", args.campaignId, "references", date, `${safeName || "reference"}.${args.extension}`].join("/");
+}
+
 export async function uploadAssetToR2(args: {
   key: string;
   body: Buffer;

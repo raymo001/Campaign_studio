@@ -53,6 +53,11 @@ Core fields:
 - `persona`
 - `editInstructions`
 
+Uploaded images can now contribute in two ways:
+
+- they are passed to supported models as visual reference inputs
+- they are analyzed automatically to produce reusable prompt cues that get folded into the final provider prompt
+
 ## Provider Rendering Strategy
 
 ### Gemini
@@ -111,10 +116,12 @@ The generation flow now:
 
 1. reads campaign and product context
 2. optionally reads a selected persona profile
-3. builds the internal prompt spec
-4. stores prompt metadata with the generation job
-5. renders a provider-specific prompt
-6. sends the rendered prompt to the selected model
+3. optionally accepts uploaded reference images from the user
+4. analyzes uploaded references and extracts prompt cues
+5. builds the internal prompt spec
+6. stores prompt metadata with the generation job
+7. renders a provider-specific prompt
+8. sends the rendered prompt to the selected model
 
 For persona-editorial generations, the generated asset can become the persona reference image automatically so that later try-on flows have a reusable visual anchor.
 

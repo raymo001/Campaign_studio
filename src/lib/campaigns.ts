@@ -155,6 +155,7 @@ export function buildImagePrompt(args: {
     physicalFeatures: string[];
     referenceImageUrl?: string;
   };
+  referenceCues?: string[];
   useCase?: PromptUseCase;
   aspectRatio?: string;
   imageSize?: string;
@@ -170,6 +171,7 @@ export function buildImagePrompt(args: {
     brief: args.brief,
     products: args.products,
     persona: args.persona,
+    referenceCues: args.referenceCues,
     useCase: args.useCase,
     aspectRatio: args.aspectRatio,
     imageSize: args.imageSize,

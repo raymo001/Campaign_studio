@@ -16,6 +16,7 @@ Date: March 21, 2026
 - [x] Add a dedicated `/tutorials` help route and keep guidance out of the main workflow surfaces.
 - [x] Add a provider-aware internal prompt system with support for product highlight, try-on, and persona-led generation.
 - [x] Add persona records and a first persona management screen for future try-on workflows.
+- [x] Allow persona reference images and prompt reference images to be uploaded from the computer.
 
 ## Next Build Slice
 

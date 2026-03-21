@@ -152,6 +152,9 @@ export default async function CampaignDetailPage({
                 {latestBrief?.copyDirection?.hook ||
                   "Render the next campaign variant from the saved brief."}
               </div>
+              <div className="text-sm text-white/38">
+                Add reference images to guide styling, composition, or persona context. Uploaded images are tagged automatically and folded into the prompt.
+              </div>
 
               <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-6">
                 <ComposerField>
@@ -244,6 +247,16 @@ export default async function CampaignDetailPage({
                     className="h-11 rounded-[16px] border border-white/8 bg-black/18 px-3 text-sm text-white outline-none"
                   />
                 </ComposerField>
+              </div>
+
+              <div>
+                <input
+                  type="file"
+                  name="referenceFiles"
+                  accept="image/*"
+                  multiple
+                  className="block w-full rounded-[18px] border border-white/8 bg-black/18 px-4 py-3 text-sm text-white/72 file:mr-4 file:rounded-full file:border-0 file:bg-white/10 file:px-4 file:py-2 file:text-sm file:font-medium file:text-white"
+                />
               </div>
             </div>
 

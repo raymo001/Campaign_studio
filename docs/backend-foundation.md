@@ -74,6 +74,7 @@ Behavior:
 - personas can now be created and reused during generation
 - generation jobs can now store `useCase`, `personaId`, and prompt metadata
 - persona-editorial generations can automatically update the persona reference image for later try-on use
+- uploaded reference images can be added from the computer, uploaded to R2, and analyzed into prompt cues
 - `/campaigns/[campaignId]` reads the full campaign detail model from Convex
 - generation creates a job record, runs the chosen provider, uploads the image to R2, then stores the asset record in Convex
 - failed generations are written back to `generationJobs.errorMessage`
@@ -124,6 +125,7 @@ Files:
 - [tests/image-providers.test.ts](/Users/biatyraymond/Documents/Campaign_Studio/tests/image-providers.test.ts)
 - [tests/campaign-workflow.test.ts](/Users/biatyraymond/Documents/Campaign_Studio/tests/campaign-workflow.test.ts)
 - [tests/prompt-system.test.ts](/Users/biatyraymond/Documents/Campaign_Studio/tests/prompt-system.test.ts)
+- [tests/reference-images.test.ts](/Users/biatyraymond/Documents/Campaign_Studio/tests/reference-images.test.ts)
 
 Run with:
 

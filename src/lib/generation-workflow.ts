@@ -15,10 +15,16 @@ import {
 import { generateImage, type GenerateImageInput } from "@/lib/image-providers";
 import {
   buildGeneratedAssetKey,
+  buildCampaignReferenceKey,
   inferFileExtension,
   uploadAssetToR2,
 } from "@/lib/r2";
 import type { PromptUseCase } from "@/lib/prompt-system";
+import {
+  analyzeReferenceImages,
+  buildReferenceCueStrings,
+  type UploadedReferenceImage,
+} from "@/lib/reference-images";
 
 type GenerationRequest = Pick<
   GenerateImageInput,
@@ -27,6 +33,7 @@ type GenerationRequest = Pick<
   campaignId: string;
   personaId?: string;
   useCase?: PromptUseCase;
+  uploadedReferences?: UploadedReferenceImage[];
 };
 
 export async function runCampaignImageGeneration(input: GenerationRequest) {
@@ -57,6 +64,27 @@ export async function runCampaignImageGeneration(input: GenerationRequest) {
       products,
     );
 
+  const referenceAnalysis = await analyzeReferenceImages(input.uploadedReferences ?? []);
+  const uploadedReferenceRecords = await Promise.all(
+    (input.uploadedReferences ?? []).map(async (image) => {
+      const extension = inferFileExtension(image.mimeType);
+      const key = buildCampaignReferenceKey({
+        campaignId: campaign._id,
+        fileName: image.fileName,
+        extension,
+      });
+      const upload = await uploadAssetToR2({
+        key,
+        body: image.bytes,
+        contentType: image.mimeType,
+      });
+      return {
+        name: image.fileName,
+        publicUrl: upload.publicUrl,
+      };
+    }),
+  );
+
   const prompt = buildImagePrompt({
     provider: input.provider,
     campaign: {
@@ -81,6 +109,7 @@ export async function runCampaignImageGeneration(input: GenerationRequest) {
           referenceImageUrl: persona.referenceImageUrl,
         }
       : undefined,
+    referenceCues: buildReferenceCueStrings(referenceAnalysis),
     useCase: input.useCase,
     imageSize: input.imageSize,
     aspectRatio: input.aspectRatio,
@@ -90,6 +119,8 @@ export async function runCampaignImageGeneration(input: GenerationRequest) {
   const promptSpec = {
     useCase: input.useCase ?? "product-highlight",
     personaId: persona?._id,
+    referenceCues: buildReferenceCueStrings(referenceAnalysis),
+    uploadedReferences: uploadedReferenceRecords,
   };
 
   const requestedModel = input.model || defaultModelForProvider(input.provider);
@@ -121,6 +152,7 @@ export async function runCampaignImageGeneration(input: GenerationRequest) {
       referenceImages: await getReferenceImagesAsDataUrls(
         products,
         persona?.referenceImageUrl,
+        input.uploadedReferences,
       ),
     });
 
@@ -208,6 +240,7 @@ async function getReferenceImagesAsDataUrls(
     productImages: string[];
   }>,
   personaReferenceImageUrl?: string,
+  uploadedReferences?: UploadedReferenceImage[],
 ) {
   const urls = products
     .flatMap((product) => [...product.referenceImages, ...product.productImages])
@@ -217,7 +250,8 @@ async function getReferenceImagesAsDataUrls(
     urls.unshift(personaReferenceImageUrl);
   }
 
-  const trimmed = urls.slice(0, 3);
+  const uploadedDataUrls = (uploadedReferences ?? []).map((image) => image.dataUrl);
+  const trimmed = [...uploadedDataUrls, ...urls].slice(0, 4);
 
   const images = await Promise.all(
     trimmed.map(async (url) => {

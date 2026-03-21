@@ -74,6 +74,14 @@ export default async function PersonasPage() {
                 className="h-12 w-full rounded-[18px] border border-white/8 bg-black/18 px-4 text-sm text-white outline-none"
               />
             </Field>
+            <Field label="Reference image file">
+              <input
+                type="file"
+                name="referenceFile"
+                accept="image/*"
+                className="block w-full rounded-[18px] border border-white/8 bg-black/18 px-4 py-3 text-sm text-white/72 file:mr-4 file:rounded-full file:border-0 file:bg-white/10 file:px-4 file:py-2 file:text-sm file:font-medium file:text-white"
+              />
+            </Field>
 
             <button
               type="submit"
@@ -123,6 +131,10 @@ export default async function PersonasPage() {
               <div className="mt-5 text-sm leading-6 text-white/40">
                 {[...persona.styleNotes, ...persona.physicalFeatures].join(" · ") || "No notes yet."}
               </div>
+
+              {persona.referenceImageUrl ? (
+                <div className="mt-4 text-xs text-white/32">Reference image attached</div>
+              ) : null}
             </article>
           ))}
         </section>

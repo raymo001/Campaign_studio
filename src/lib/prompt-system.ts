@@ -23,7 +23,7 @@ type PromptProduct = Pick<
 >;
 
 export type PromptReferenceImage = {
-  kind: "product" | "try-on" | "persona" | "style";
+  kind: "product" | "try-on" | "persona" | "style" | "uploaded";
   url?: string;
 };
 
@@ -53,6 +53,7 @@ export type InternalPromptSpec = {
   };
   constraints: string[];
   negativeAvoidance: string[];
+  referenceCues: string[];
   references: PromptReferenceImage[];
   persona?: {
     name: string;
@@ -100,6 +101,7 @@ export function buildInternalPromptSpec(args: {
     physicalFeatures: string[];
     referenceImageUrl?: string;
   };
+  referenceCues?: string[];
   useCase?: PromptUseCase;
   aspectRatio?: string;
   imageSize?: string;
@@ -146,6 +148,7 @@ export function buildInternalPromptSpec(args: {
     },
     constraints: buildConstraints(useCase),
     negativeAvoidance: buildNegativeAvoidance(useCase),
+    referenceCues: args.referenceCues ?? [],
     references: buildReferences(useCase, args.products),
     persona: args.persona,
   };
@@ -191,6 +194,7 @@ function renderGeminiPrompt(spec: InternalPromptSpec) {
     `Style: ${spec.style.join(" ")}.`,
     `Brand tone: ${spec.brandTone.join(" ")}.`,
     spec.persona ? `Persona: ${buildPersonaDescriptor(spec.persona)}.` : undefined,
+    spec.referenceCues.length ? `Reference cues: ${spec.referenceCues.join(" ")}.` : undefined,
     spec.textOverlay?.headline ? `Headline text: ${spec.textOverlay.headline}.` : undefined,
     spec.textOverlay?.cta ? `CTA text: ${spec.textOverlay.cta}.` : undefined,
     spec.aspectRatio ? `Aspect ratio: ${spec.aspectRatio}.` : undefined,
@@ -216,6 +220,7 @@ function renderOpenAiPrompt(spec: InternalPromptSpec) {
     `Style: ${spec.style.join(" ")}.`,
     `Brand tone: ${spec.brandTone.join(" ")}.`,
     spec.persona ? `Persona: ${buildPersonaDescriptor(spec.persona)}.` : undefined,
+    spec.referenceCues.length ? `Reference cues: ${spec.referenceCues.join(" ")}.` : undefined,
     spec.textOverlay?.headline ? `Text headline: ${spec.textOverlay.headline}.` : undefined,
     spec.textOverlay?.body ? `Text body: ${spec.textOverlay.body}.` : undefined,
     spec.textOverlay?.cta ? `Text CTA: ${spec.textOverlay.cta}.` : undefined,
@@ -233,6 +238,7 @@ function renderSeedreamPrompt(spec: InternalPromptSpec) {
   return [
     spec.subject,
     spec.persona ? buildPersonaDescriptor(spec.persona) : undefined,
+    spec.referenceCues?.length ? spec.referenceCues.join(", ") : undefined,
     spec.productFocus.join("; "),
     spec.setting,
     spec.actionOrPose,
