@@ -134,6 +134,16 @@ export default function SettingsPage() {
                     ))}
                   </div>
                 ) : null}
+                {provider.supportedAspectRatios?.length ? (
+                  <p className="mt-4 text-sm leading-6 text-[var(--color-soft)]">
+                    Aspect ratios: {provider.supportedAspectRatios.join(", ")}
+                  </p>
+                ) : null}
+                {provider.supportedSizes?.length ? (
+                  <p className="mt-3 text-sm leading-6 text-[var(--color-soft)]">
+                    Sizes: {provider.supportedSizes.join(", ")}
+                  </p>
+                ) : null}
                 {provider.missingEnv.length > 0 ? (
                   <p className="mt-4 text-sm leading-6 text-[var(--color-soft)]">
                     Missing: {provider.missingEnv.join(", ")}

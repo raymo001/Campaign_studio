@@ -38,6 +38,8 @@ export type ImageProviderStatus = {
   label: string;
   model: string;
   availableModels?: string[];
+  supportedAspectRatios?: string[];
+  supportedSizes?: string[];
   ready: boolean;
   capabilities: Array<"generate" | "edit">;
   missingEnv: string[];
@@ -52,6 +54,30 @@ export type ImageResult = {
   imageUrl?: string;
   text?: string;
 };
+
+const seedreamSizeMatrix = {
+  "2048x2048": { resolution: "2K", aspectRatio: "1:1" },
+  "2304x1728": { resolution: "2K", aspectRatio: "4:3" },
+  "1728x2304": { resolution: "2K", aspectRatio: "3:4" },
+  "2848x1600": { resolution: "2K", aspectRatio: "16:9" },
+  "1600x2848": { resolution: "2K", aspectRatio: "9:16" },
+  "2496x1664": { resolution: "2K", aspectRatio: "3:2" },
+  "1664x2496": { resolution: "2K", aspectRatio: "2:3" },
+  "3136x1344": { resolution: "2K", aspectRatio: "21:9" },
+  "4096x4096": { resolution: "4K", aspectRatio: "1:1" },
+  "3520x4704": { resolution: "4K", aspectRatio: "3:4" },
+  "4704x3520": { resolution: "4K", aspectRatio: "4:3" },
+  "5504x3040": { resolution: "4K", aspectRatio: "16:9" },
+  "3040x5504": { resolution: "4K", aspectRatio: "9:16" },
+  "3328x4992": { resolution: "4K", aspectRatio: "2:3" },
+  "4992x3328": { resolution: "4K", aspectRatio: "3:2" },
+  "6240x2656": { resolution: "4K", aspectRatio: "21:9" },
+} as const;
+
+const seedreamSupportedSizes = Object.keys(seedreamSizeMatrix);
+const seedreamSupportedAspectRatios = [
+  ...new Set(Object.values(seedreamSizeMatrix).map((value) => value.aspectRatio)),
+];
 
 function readEnv(key: string) {
   const value = process.env[key];
@@ -318,10 +344,17 @@ async function generateWithSeedream(
     "https://ark.ap-southeast.bytepluses.com/api/v3";
   const url = `${configuredBase.replace(/\/$/, "")}/images/generations`;
 
+  const size = input.size ?? "2048x2048";
+  if (!seedreamSupportedSizes.includes(size)) {
+    throw new Error(
+      `Unsupported Seedream size: ${size}. Supported sizes: ${seedreamSupportedSizes.join(", ")}`,
+    );
+  }
+
   const payload: Record<string, unknown> = {
     model,
     prompt: input.prompt,
-    size: input.size ?? "2048x2048",
+    size,
     response_format: "b64_json",
   };
 
@@ -382,10 +415,12 @@ export function getImageProviderStatuses(): ImageProviderStatus[] {
       label: "Seedream via BytePlus ModelArk",
       model: readEnv("SEEDREAM_IMAGE_MODEL") || "seedream-4-5-251128",
       ready: Boolean(readEnv("ARK_API_KEY")),
+      supportedAspectRatios: seedreamSupportedAspectRatios,
+      supportedSizes: seedreamSupportedSizes,
       capabilities: ["generate"],
       missingEnv: readEnv("ARK_API_KEY") ? [] : ["ARK_API_KEY"],
       notes:
-        "BytePlus documents an OpenAI-compatible Ark base URL. Depending on your account setup, the model value may need to be a deployed endpoint ID rather than only a family name.",
+        "Validated against the Seedream 4.5 recommended 2K and 4K size matrix you provided. The model value may still need to be a deployed endpoint ID for your BytePlus account.",
     },
   ];
 

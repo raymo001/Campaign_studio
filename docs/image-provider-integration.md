@@ -75,6 +75,29 @@ You can control the Gemini catalog with:
 - Seedream generation now follows the BytePlus ModelArk OpenAI-compatible base URL shape: `https://ark.ap-southeast.bytepluses.com/api/v3/images/generations`.
 - BytePlus documents that `model` can be an endpoint ID or a model ID. If `seedream-4-5-251128` is rejected, use the deployed endpoint ID or the exact model ID from your BytePlus console.
 
+### Seedream 4.5 validated size matrix
+
+The Seedream integration now validates against the supported sizes you provided:
+
+- 2K
+  - `2048x2048` `1:1`
+  - `2304x1728` `4:3`
+  - `1728x2304` `3:4`
+  - `2848x1600` `16:9`
+  - `1600x2848` `9:16`
+  - `2496x1664` `3:2`
+  - `1664x2496` `2:3`
+  - `3136x1344` `21:9`
+- 4K
+  - `4096x4096` `1:1`
+  - `3520x4704` `3:4`
+  - `4704x3520` `4:3`
+  - `5504x3040` `16:9`
+  - `3040x5504` `9:16`
+  - `3328x4992` `2:3`
+  - `4992x3328` `3:2`
+  - `6240x2656` `21:9`
+
 ## Sources
 
 - Gemini image generation: https://ai.google.dev/gemini-api/docs/image-generation
