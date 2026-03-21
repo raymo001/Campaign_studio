@@ -1,0 +1,207 @@
+import {
+  buildCampaignBrief,
+  buildImagePrompt,
+} from "@/lib/campaigns";
+import {
+  createAssetInConvex,
+  createGenerationJobInConvex,
+  getCampaignDetailFromConvex,
+  markGenerationJobCompletedInConvex,
+  markGenerationJobFailedInConvex,
+  markGenerationJobRunningInConvex,
+} from "@/lib/convex-server";
+import { generateImage, type GenerateImageInput } from "@/lib/image-providers";
+import {
+  buildGeneratedAssetKey,
+  inferFileExtension,
+  uploadAssetToR2,
+} from "@/lib/r2";
+
+type GenerationRequest = Pick<
+  GenerateImageInput,
+  "provider" | "model" | "size" | "aspectRatio" | "imageSize" | "quality" | "background"
+> & {
+  campaignId: string;
+};
+
+export async function runCampaignImageGeneration(input: GenerationRequest) {
+  const detail = await getCampaignDetailFromConvex(input.campaignId);
+  if (!detail) {
+    throw new Error("Campaign not found.");
+  }
+
+  const campaign = detail.campaign;
+  const products = detail.products;
+  if (products.length === 0) {
+    throw new Error("Campaign has no synced products attached.");
+  }
+
+  const latestBrief =
+    detail.briefs[0]?.briefJson ??
+    buildCampaignBrief(
+      {
+        name: campaign.name,
+        objective: campaign.objective,
+        primaryPlatform: campaign.primaryPlatform,
+        platformMix: campaign.platformMix,
+        locale: campaign.locale,
+        audienceAngle: campaign.audienceAngle,
+        productSkus: campaign.productSkus,
+      },
+      products,
+    );
+
+  const prompt = buildImagePrompt({
+    campaign: {
+      name: campaign.name,
+      objective: campaign.objective,
+      primaryPlatform: campaign.primaryPlatform,
+      platformMix: campaign.platformMix,
+      locale: campaign.locale,
+      audienceAngle: campaign.audienceAngle,
+      productSkus: campaign.productSkus,
+    },
+    brief: latestBrief,
+    products,
+    aspectRatio: input.aspectRatio,
+  });
+
+  const requestedModel = input.model || defaultModelForProvider(input.provider);
+  const jobId = await createGenerationJobInConvex({
+    campaignId: campaign._id,
+    briefId: detail.briefs[0]?._id,
+    type: "image",
+    provider: input.provider,
+    model: requestedModel,
+    prompt,
+    sourceProductSkus: campaign.productSkus,
+  });
+
+  try {
+    await markGenerationJobRunningInConvex(jobId);
+
+    const result = await generateImage({
+      provider: input.provider,
+      model: input.model,
+      prompt,
+      size: input.size,
+      aspectRatio: input.aspectRatio,
+      imageSize: input.imageSize,
+      quality: input.quality,
+      background: input.background,
+      referenceImages: await getReferenceImagesAsDataUrls(products),
+    });
+
+    const resolved = await resolveImageBinary(result);
+    const extension = inferFileExtension(resolved.mimeType);
+    const key = buildGeneratedAssetKey({
+      campaignId: campaign._id,
+      generationJobId: jobId,
+      extension,
+    });
+    const upload = await uploadAssetToR2({
+      key,
+      body: resolved.buffer,
+      contentType: resolved.mimeType,
+    });
+
+    const assetId = await createAssetInConvex({
+      campaignId: campaign._id,
+      generationJobId: jobId,
+      kind: "image",
+      provider: result.provider,
+      model: result.model,
+      status: "ready",
+      sourceProductSkus: campaign.productSkus,
+      r2Key: upload.key,
+      publicUrl: upload.publicUrl,
+      aspectRatio: input.aspectRatio,
+      mimeType: resolved.mimeType,
+    });
+
+    await markGenerationJobCompletedInConvex(jobId);
+
+    return {
+      campaignId: campaign._id,
+      jobId,
+      assetId,
+      publicUrl: upload.publicUrl,
+      prompt,
+      model: result.model,
+    };
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "Unknown generation error";
+    await markGenerationJobFailedInConvex({
+      jobId,
+      errorMessage: message,
+    });
+    throw error;
+  }
+}
+
+async function resolveImageBinary(result: Awaited<ReturnType<typeof generateImage>>) {
+  if (result.imageBase64) {
+    return {
+      mimeType: result.mimeType,
+      buffer: Buffer.from(result.imageBase64, "base64"),
+    };
+  }
+
+  if (result.imageUrl) {
+    const response = await fetch(result.imageUrl);
+    if (!response.ok) {
+      throw new Error(`Failed to fetch generated image URL: ${response.status}`);
+    }
+
+    return {
+      mimeType: response.headers.get("content-type") || result.mimeType || "image/jpeg",
+      buffer: Buffer.from(await response.arrayBuffer()),
+    };
+  }
+
+  throw new Error("Image provider returned neither base64 nor image URL.");
+}
+
+async function getReferenceImagesAsDataUrls(
+  products: Array<{
+    referenceImages: string[];
+    productImages: string[];
+  }>,
+) {
+  const urls = products
+    .flatMap((product) => [...product.referenceImages, ...product.productImages])
+    .filter(Boolean)
+    .slice(0, 2);
+
+  const images = await Promise.all(
+    urls.map(async (url) => {
+      try {
+        const response = await fetch(url);
+        if (!response.ok) {
+          return null;
+        }
+        const mimeType = response.headers.get("content-type");
+        if (!mimeType?.startsWith("image/")) {
+          return null;
+        }
+        const buffer = Buffer.from(await response.arrayBuffer());
+        return `data:${mimeType};base64,${buffer.toString("base64")}`;
+      } catch {
+        return null;
+      }
+    }),
+  );
+
+  return images.filter((image) => image !== null);
+}
+
+function defaultModelForProvider(provider: GenerateImageInput["provider"]) {
+  switch (provider) {
+    case "gemini":
+      return process.env.GEMINI_IMAGE_MODEL || "gemini-3.1-flash-image-preview";
+    case "seedream":
+      return process.env.SEEDREAM_IMAGE_MODEL || "seedream-4-5-251128";
+    case "openai":
+      return process.env.OPENAI_IMAGE_MODEL || "gpt-image-1.5";
+  }
+}

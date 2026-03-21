@@ -23,24 +23,24 @@ Date: March 21, 2026
 
 ### Campaign Core
 
-- [ ] Wire `/campaigns/new` to `campaigns.create`.
-- [ ] Add structured brief schema and persistence.
+- [x] Wire `/campaigns/new` to `campaigns.create`.
+- [x] Add structured brief schema and persistence.
 - [ ] Create platform preset records and selection logic.
 
 ### Generation Pipeline
 
-- [ ] Persist generation jobs from `/api/images/generate`.
-- [ ] Write generated image metadata to `assets`.
-- [ ] Upload generated results to R2 and persist public URLs.
+- [x] Persist generation jobs from the campaign generation workflow.
+- [x] Write generated image metadata to `assets`.
+- [x] Upload generated results to R2 and persist public URLs.
 
 ### Review System
 
 - [ ] Add approval and export states for assets.
-- [ ] Add campaign detail read model for brief + jobs + assets.
-- [ ] Add review board UI backed by Convex queries.
+- [x] Add campaign detail read model for brief + jobs + assets.
+- [x] Add review board UI backed by Convex queries.
 
 ### Testing
 
 - [ ] Add integration tests for the feed sync route.
 - [ ] Add smoke-test scripts for Gemini, OpenAI, and Seedream image generation.
-- [ ] Add schema-level tests for campaign and job creation mutations.
+- [x] Add workflow-level tests for brief generation and R2 asset URL construction.

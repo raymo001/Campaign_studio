@@ -9,6 +9,7 @@ Next.js foundation for a clean campaign studio that generates product-grounded i
 - setup guide for Convex, Vercel, and Cloudflare R2
 - local environment template
 - R2 CORS helper script
+- campaign creation, brief persistence, and R2-backed image generation flow
 
 ## Local Development
 
@@ -45,6 +46,12 @@ Open [http://localhost:3000](http://localhost:3000).
 - `GET /api/image-providers`
 - `POST /api/images/generate`
 - `POST /api/images/edit`
+
+## Campaign Workflow
+
+- `/campaigns/new` creates a campaign and its first brief from live product data
+- `/campaigns/[campaignId]` shows the brief, generation jobs, and stored assets
+- generation uploads final images to Cloudflare R2 and stores the public URL in Convex
 
 ## Environment
 

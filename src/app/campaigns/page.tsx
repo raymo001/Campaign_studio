@@ -20,12 +20,6 @@ export default async function CampaignsPage() {
             >
               Create Campaign
             </Link>
-            <Link
-              href="/campaigns/sample-campaign"
-              className="rounded-full border border-white/10 bg-white/5 px-5 py-3 text-sm font-semibold text-white"
-            >
-              Open Sample Campaign
-            </Link>
           </div>
         </Panel>
 
@@ -38,8 +32,8 @@ export default async function CampaignsPage() {
             <div className="mt-6 grid gap-3">
               {campaigns.length === 0 ? (
                 <div className="rounded-[24px] border border-dashed border-white/10 px-4 py-8 text-sm text-[var(--color-soft)]">
-                  No campaigns exist yet. The Convex campaign table is ready, and
-                  the next step is wiring the create flow to `campaigns.create`.
+                  No campaigns exist yet. Create one to persist a structured brief,
+                  generation jobs, and R2-backed assets.
                 </div>
               ) : null}
               {campaigns.map((campaign) => (
@@ -48,9 +42,12 @@ export default async function CampaignsPage() {
                   className="rounded-[24px] border border-white/6 bg-black/18 p-4"
                 >
                   <div className="flex flex-wrap items-center justify-between gap-3">
-                    <h3 className="text-lg font-semibold text-white">
+                    <Link
+                      href={`/campaigns/${campaign._id}`}
+                      className="text-lg font-semibold text-white hover:text-[var(--color-orange)]"
+                    >
                       {campaign.name}
-                    </h3>
+                    </Link>
                     <span className="rounded-full border border-[var(--color-orange)]/25 bg-[var(--color-orange-soft)] px-3 py-1 text-xs font-bold uppercase tracking-[0.16em] text-[var(--color-orange)]">
                       {campaign.status}
                     </span>

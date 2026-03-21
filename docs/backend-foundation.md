@@ -46,8 +46,28 @@ These provide server-side helpers for:
 
 - querying products
 - querying campaigns
+- creating campaigns with their initial brief
+- reading campaign detail with briefs, jobs, assets, and linked products
 - reading sync summary
 - triggering manual sync
+
+### Campaign workflow
+
+Files:
+
+- [src/lib/campaigns.ts](/Users/biatyraymond/Documents/Campaign_Studio/src/lib/campaigns.ts)
+- [src/lib/generation-workflow.ts](/Users/biatyraymond/Documents/Campaign_Studio/src/lib/generation-workflow.ts)
+- [src/lib/r2.ts](/Users/biatyraymond/Documents/Campaign_Studio/src/lib/r2.ts)
+- [src/app/campaigns/actions.ts](/Users/biatyraymond/Documents/Campaign_Studio/src/app/campaigns/actions.ts)
+- [convex/campaigns.ts](/Users/biatyraymond/Documents/Campaign_Studio/convex/campaigns.ts)
+
+Behavior:
+
+- `/campaigns/new` now creates a campaign plus its first structured brief
+- the brief is generated from synced product data and campaign inputs
+- `/campaigns/[campaignId]` reads the full campaign detail model from Convex
+- generation creates a job record, runs the chosen provider, uploads the image to R2, then stores the asset record in Convex
+- failed generations are written back to `generationJobs.errorMessage`
 
 ### API route
 
@@ -64,6 +84,8 @@ Pages now read real Convex data:
 
 - [src/app/products/page.tsx](/Users/biatyraymond/Documents/Campaign_Studio/src/app/products/page.tsx)
 - [src/app/campaigns/page.tsx](/Users/biatyraymond/Documents/Campaign_Studio/src/app/campaigns/page.tsx)
+- [src/app/campaigns/new/page.tsx](/Users/biatyraymond/Documents/Campaign_Studio/src/app/campaigns/new/page.tsx)
+- [src/app/campaigns/[campaignId]/page.tsx](/Users/biatyraymond/Documents/Campaign_Studio/src/app/campaigns/[campaignId]/page.tsx)
 
 ## Tests
 
@@ -72,11 +94,14 @@ Test coverage currently focuses on:
 - feed normalization
 - Gemini capability matrix
 - Seedream size matrix
+- brief generation and prompt construction
+- R2 key and public URL construction
 
 Files:
 
 - [tests/feed.test.ts](/Users/biatyraymond/Documents/Campaign_Studio/tests/feed.test.ts)
 - [tests/image-providers.test.ts](/Users/biatyraymond/Documents/Campaign_Studio/tests/image-providers.test.ts)
+- [tests/campaign-workflow.test.ts](/Users/biatyraymond/Documents/Campaign_Studio/tests/campaign-workflow.test.ts)
 
 Run with:
 

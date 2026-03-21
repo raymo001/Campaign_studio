@@ -31,6 +31,95 @@ export const create = mutation({
   },
 });
 
+export const createCampaignWithBrief = mutation({
+  args: {
+    name: v.string(),
+    objective: v.string(),
+    primaryPlatform: v.string(),
+    platformMix: v.array(v.string()),
+    locale: v.string(),
+    audienceAngle: v.optional(v.string()),
+    productSkus: v.array(v.string()),
+    briefJson: v.any(),
+    briefModel: v.optional(v.string()),
+  },
+  handler: async (ctx, args) => {
+    const now = Date.now();
+    const campaignId = await ctx.db.insert("campaigns", {
+      name: args.name,
+      objective: args.objective,
+      primaryPlatform: args.primaryPlatform,
+      platformMix: args.platformMix,
+      locale: args.locale,
+      audienceAngle: args.audienceAngle,
+      productSkus: args.productSkus,
+      status: "draft",
+      createdAt: now,
+      updatedAt: now,
+    });
+
+    const briefId = await ctx.db.insert("briefs", {
+      campaignId,
+      status: "draft",
+      model: args.briefModel,
+      briefJson: args.briefJson,
+      createdAt: now,
+      updatedAt: now,
+    });
+
+    return { campaignId, briefId };
+  },
+});
+
+export const getDetail = query({
+  args: {
+    campaignId: v.id("campaigns"),
+  },
+  handler: async (ctx, args) => {
+    const campaign = await ctx.db.get(args.campaignId);
+    if (!campaign) {
+      return null;
+    }
+
+    const briefs = await ctx.db
+      .query("briefs")
+      .withIndex("by_campaign", (q) => q.eq("campaignId", args.campaignId))
+      .order("desc")
+      .take(20);
+
+    const generationJobs = await ctx.db
+      .query("generationJobs")
+      .withIndex("by_campaign", (q) => q.eq("campaignId", args.campaignId))
+      .order("desc")
+      .take(50);
+
+    const assets = await ctx.db
+      .query("assets")
+      .withIndex("by_campaign", (q) => q.eq("campaignId", args.campaignId))
+      .order("desc")
+      .take(100);
+
+    const products = (
+      await Promise.all(
+        campaign.productSkus.map((sku) =>
+          ctx.db
+            .query("products")
+            .withIndex("by_sku", (q) => q.eq("sku", sku))
+            .unique(),
+        ),
+      )
+    ).filter((product) => product !== null);
+
+    return {
+      campaign,
+      briefs,
+      generationJobs,
+      assets,
+      products,
+    };
+  },
+});
+
 export const createBriefDraft = mutation({
   args: {
     campaignId: v.id("campaigns"),
@@ -67,6 +156,68 @@ export const createGenerationJob = mutation({
       status: "queued",
       createdAt: now,
       updatedAt: now,
+    });
+  },
+});
+
+export const markGenerationJobRunning = mutation({
+  args: {
+    jobId: v.id("generationJobs"),
+  },
+  handler: async (ctx, args) => {
+    await ctx.db.patch(args.jobId, {
+      status: "running",
+      updatedAt: Date.now(),
+    });
+  },
+});
+
+export const markGenerationJobCompleted = mutation({
+  args: {
+    jobId: v.id("generationJobs"),
+  },
+  handler: async (ctx, args) => {
+    await ctx.db.patch(args.jobId, {
+      status: "completed",
+      updatedAt: Date.now(),
+    });
+  },
+});
+
+export const markGenerationJobFailed = mutation({
+  args: {
+    jobId: v.id("generationJobs"),
+    errorMessage: v.string(),
+  },
+  handler: async (ctx, args) => {
+    await ctx.db.patch(args.jobId, {
+      status: "failed",
+      errorMessage: args.errorMessage,
+      updatedAt: Date.now(),
+    });
+  },
+});
+
+export const createAsset = mutation({
+  args: {
+    campaignId: v.optional(v.id("campaigns")),
+    generationJobId: v.optional(v.id("generationJobs")),
+    kind: v.string(),
+    provider: v.string(),
+    model: v.string(),
+    status: v.string(),
+    sourceProductSkus: v.array(v.string()),
+    r2Key: v.optional(v.string()),
+    publicUrl: v.optional(v.string()),
+    aspectRatio: v.optional(v.string()),
+    mimeType: v.optional(v.string()),
+    width: v.optional(v.number()),
+    height: v.optional(v.number()),
+  },
+  handler: async (ctx, args) => {
+    return ctx.db.insert("assets", {
+      ...args,
+      createdAt: Date.now(),
     });
   },
 });
