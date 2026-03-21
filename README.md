@@ -34,8 +34,15 @@ Open [http://localhost:3000](http://localhost:3000).
 ## Docs
 
 - `docs/campaign-studio-plan.md`
+- `docs/image-provider-integration.md`
 - `docs/wireframes-and-route-map.md`
 - `docs/platform-setup.md`
+
+## Image Provider Routes
+
+- `GET /api/image-providers`
+- `POST /api/images/generate`
+- `POST /api/images/edit`
 
 ## Environment
 

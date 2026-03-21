@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "typecheck": "tsc --noEmit",
+    "typecheck": "next build",
     "r2:cors": "node scripts/setup-r2-cors.mjs"
   },
   "dependencies": {

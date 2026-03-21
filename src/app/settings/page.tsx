@@ -1,4 +1,5 @@
 import { Panel } from "@/components/panel";
+import { getImageProviderStatuses } from "@/lib/image-providers";
 
 const integrations = [
   {
@@ -18,6 +19,8 @@ const integrations = [
     note: "Add API key and model selections in `.env.local` before generation features are wired in.",
   },
 ];
+
+const imageProviders = getImageProviderStatuses();
 
 export default function SettingsPage() {
   return (
@@ -53,12 +56,17 @@ export default function SettingsPage() {
           <div className="mt-6 grid gap-2">
             {[
               "OPENAI_API_KEY",
+              "GEMINI_API_KEY",
+              "ARK_API_KEY",
               "CONVEX_DEPLOYMENT",
               "NEXT_PUBLIC_CONVEX_URL",
               "CLOUDFLARE_ACCOUNT_ID",
               "CLOUDFLARE_R2_BUCKET",
               "R2_ACCESS_KEY_ID",
               "R2_SECRET_ACCESS_KEY",
+              "GEMINI_IMAGE_MODEL",
+              "OPENAI_IMAGE_MODEL",
+              "SEEDREAM_IMAGE_MODEL",
               "VERCEL_PROJECT_ID",
               "VERCEL_ORG_ID",
             ].map((item) => (
@@ -69,6 +77,72 @@ export default function SettingsPage() {
                 {item}
               </div>
             ))}
+          </div>
+        </Panel>
+      </div>
+
+      <div className="mt-4">
+        <Panel
+          eyebrow="Image Models"
+          title="Provider readiness"
+          description="These providers are now wired into the app through server routes for generation and, in OpenAI's case, edits."
+        >
+          <div className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+            {imageProviders.map((provider) => (
+              <div
+                key={provider.id}
+                className="rounded-[24px] border border-white/6 bg-black/18 p-5"
+              >
+                <div className="flex items-start justify-between gap-3">
+                  <div>
+                    <div className="text-lg font-semibold text-white">
+                      {provider.label}
+                    </div>
+                    <div className="mt-2 text-sm text-[var(--color-soft)]">
+                      {provider.model}
+                    </div>
+                  </div>
+                  <span
+                    className={`rounded-full px-3 py-1 text-xs font-bold uppercase tracking-[0.16em] ${
+                      provider.ready
+                        ? "bg-[var(--color-green)] text-white"
+                        : "bg-[var(--color-orange-soft)] text-[var(--color-orange)]"
+                    }`}
+                  >
+                    {provider.ready ? "Ready" : "Missing Env"}
+                  </span>
+                </div>
+                <div className="mt-4 flex flex-wrap gap-2">
+                  {provider.capabilities.map((capability) => (
+                    <span
+                      key={capability}
+                      className="rounded-full border border-white/8 px-3 py-1 text-xs uppercase tracking-[0.14em] text-white/80"
+                    >
+                      {capability}
+                    </span>
+                  ))}
+                </div>
+                {provider.missingEnv.length > 0 ? (
+                  <p className="mt-4 text-sm leading-6 text-[var(--color-soft)]">
+                    Missing: {provider.missingEnv.join(", ")}
+                  </p>
+                ) : null}
+                {provider.notes ? (
+                  <p className="mt-4 text-sm leading-6 text-[var(--color-soft)]">
+                    {provider.notes}
+                  </p>
+                ) : null}
+              </div>
+            ))}
+          </div>
+          <div className="mt-6 rounded-[24px] border border-white/6 bg-[var(--color-panel)] p-5 text-sm leading-7 text-white/84">
+            Routes:
+            <br />
+            `GET /api/image-providers`
+            <br />
+            `POST /api/images/generate`
+            <br />
+            `POST /api/images/edit`
           </div>
         </Panel>
       </div>

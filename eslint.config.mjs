@@ -13,6 +13,7 @@ const eslintConfig = defineConfig([
     "build/**",
     "next-env.d.ts",
     "campaign-studio-app/**",
+    "convex/_generated/**",
   ]),
 ]);
 
