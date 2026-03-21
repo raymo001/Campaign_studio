@@ -4,12 +4,14 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { buildCampaignBrief } from "@/lib/campaigns";
 import {
+  createPersonaInConvex,
   createCampaignWithBriefInConvex,
   getCampaignDetailFromConvex,
   listProductsFromConvex,
 } from "@/lib/convex-server";
 import { runCampaignImageGeneration } from "@/lib/generation-workflow";
 import { geminiSupportedImageSizes } from "@/lib/image-providers";
+import { promptUseCaseOptions } from "@/lib/prompt-system";
 
 export async function createCampaignAction(formData: FormData) {
   const name = String(formData.get("name") || "").trim();
@@ -72,6 +74,8 @@ export async function generateCampaignImageAction(formData: FormData) {
   const aspectRatio = String(formData.get("aspectRatio") || "").trim();
   const imageSize = String(formData.get("imageSize") || "").trim();
   const size = String(formData.get("size") || "").trim();
+  const personaId = String(formData.get("personaId") || "").trim();
+  const useCase = String(formData.get("useCase") || "product-highlight").trim();
 
   if (!campaignId || !provider) {
     throw new Error("Campaign and provider are required.");
@@ -86,6 +90,10 @@ export async function generateCampaignImageAction(formData: FormData) {
     campaignId,
     provider: provider as "gemini" | "openai" | "seedream",
     model: model || undefined,
+    personaId: personaId || undefined,
+    useCase: promptUseCaseOptions.includes(useCase as (typeof promptUseCaseOptions)[number])
+      ? (useCase as (typeof promptUseCaseOptions)[number])
+      : "product-highlight",
     aspectRatio: aspectRatio || undefined,
     imageSize: geminiSupportedImageSizes.includes(
       imageSize as (typeof geminiSupportedImageSizes)[number],
@@ -98,4 +106,39 @@ export async function generateCampaignImageAction(formData: FormData) {
   revalidatePath(`/campaigns/${campaignId}`);
   revalidatePath("/campaigns");
   redirect(`/campaigns/${campaignId}`);
+}
+
+export async function createPersonaAction(formData: FormData) {
+  const name = String(formData.get("name") || "").trim();
+  const locale = String(formData.get("locale") || "en-US").trim();
+  const ageBand = String(formData.get("ageBand") || "").trim();
+  const genderPresentation = String(formData.get("genderPresentation") || "").trim();
+  const archetype = String(formData.get("archetype") || "").trim();
+  const referenceImageUrl = String(formData.get("referenceImageUrl") || "").trim();
+  const styleNotes = String(formData.get("styleNotes") || "")
+    .split(",")
+    .map((value) => value.trim())
+    .filter(Boolean);
+  const physicalFeatures = String(formData.get("physicalFeatures") || "")
+    .split(",")
+    .map((value) => value.trim())
+    .filter(Boolean);
+
+  if (!name) {
+    throw new Error("Persona name is required.");
+  }
+
+  await createPersonaInConvex({
+    name,
+    locale,
+    ageBand: ageBand || undefined,
+    genderPresentation: genderPresentation || undefined,
+    archetype: archetype || undefined,
+    styleNotes,
+    physicalFeatures,
+    referenceImageUrl: referenceImageUrl || undefined,
+  });
+
+  revalidatePath("/personas");
+  redirect("/personas");
 }

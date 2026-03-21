@@ -12,6 +12,7 @@ import type * as campaigns from "../campaigns.js";
 import type * as crons from "../crons.js";
 import type * as feed from "../feed.js";
 import type * as feedStore from "../feedStore.js";
+import type * as personas from "../personas.js";
 import type * as products from "../products.js";
 
 import type {
@@ -25,6 +26,7 @@ declare const fullApi: ApiFromModules<{
   crons: typeof crons;
   feed: typeof feed;
   feedStore: typeof feedStore;
+  personas: typeof personas;
   products: typeof products;
 }>;
 

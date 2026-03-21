@@ -146,6 +146,15 @@ export function buildImagePrompt(args: {
   campaign: CampaignSeed;
   brief: ReturnType<typeof buildCampaignBrief>;
   products: CampaignBriefProduct[];
+  persona?: {
+    name: string;
+    archetype?: string;
+    ageBand?: string;
+    genderPresentation?: string;
+    styleNotes: string[];
+    physicalFeatures: string[];
+    referenceImageUrl?: string;
+  };
   useCase?: PromptUseCase;
   aspectRatio?: string;
   imageSize?: string;
@@ -160,6 +169,7 @@ export function buildImagePrompt(args: {
     },
     brief: args.brief,
     products: args.products,
+    persona: args.persona,
     useCase: args.useCase,
     aspectRatio: args.aspectRatio,
     imageSize: args.imageSize,

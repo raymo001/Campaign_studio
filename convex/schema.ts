@@ -97,11 +97,14 @@ export default defineSchema({
   generationJobs: defineTable({
     campaignId: v.optional(v.id("campaigns")),
     briefId: v.optional(v.id("briefs")),
+    personaId: v.optional(v.id("personas")),
     type: v.string(),
+    useCase: v.optional(v.string()),
     provider: v.string(),
     model: v.string(),
     status: v.string(),
     prompt: v.string(),
+    promptSpec: v.optional(v.any()),
     sourceProductSkus: v.array(v.string()),
     createdAt: v.number(),
     updatedAt: v.number(),
@@ -114,6 +117,7 @@ export default defineSchema({
   assets: defineTable({
     campaignId: v.optional(v.id("campaigns")),
     generationJobId: v.optional(v.id("generationJobs")),
+    personaId: v.optional(v.id("personas")),
     kind: v.string(),
     provider: v.string(),
     model: v.string(),
@@ -129,4 +133,21 @@ export default defineSchema({
   })
     .index("by_campaign", ["campaignId"])
     .index("by_generation_job", ["generationJobId"]),
+
+  personas: defineTable({
+    name: v.string(),
+    slug: v.string(),
+    status: v.string(),
+    locale: v.string(),
+    ageBand: v.optional(v.string()),
+    genderPresentation: v.optional(v.string()),
+    archetype: v.optional(v.string()),
+    styleNotes: v.array(v.string()),
+    physicalFeatures: v.array(v.string()),
+    referenceImageUrl: v.optional(v.string()),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  })
+    .index("by_slug", ["slug"])
+    .index("by_updated_at", ["updatedAt"]),
 });

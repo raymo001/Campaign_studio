@@ -113,6 +113,13 @@ function NavIcon({ type }: { type: (typeof primaryNavigation)[number]["icon"] })
           <path d="M16 10v8" />
         </svg>
       );
+    case "user":
+      return (
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className={className}>
+          <path d="M12 12a4 4 0 1 0-4-4 4 4 0 0 0 4 4Z" />
+          <path d="M5 20a7 7 0 0 1 14 0" />
+        </svg>
+      );
     case "book":
       return (
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className={className}>

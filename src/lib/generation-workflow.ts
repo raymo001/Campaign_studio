@@ -3,8 +3,10 @@ import {
   buildImagePrompt,
 } from "@/lib/campaigns";
 import {
+  attachPersonaReferenceImageInConvex,
   createAssetInConvex,
   createGenerationJobInConvex,
+  getPersonaFromConvex,
   getCampaignDetailFromConvex,
   markGenerationJobCompletedInConvex,
   markGenerationJobFailedInConvex,
@@ -16,12 +18,15 @@ import {
   inferFileExtension,
   uploadAssetToR2,
 } from "@/lib/r2";
+import type { PromptUseCase } from "@/lib/prompt-system";
 
 type GenerationRequest = Pick<
   GenerateImageInput,
   "provider" | "model" | "size" | "aspectRatio" | "imageSize" | "quality" | "background"
 > & {
   campaignId: string;
+  personaId?: string;
+  useCase?: PromptUseCase;
 };
 
 export async function runCampaignImageGeneration(input: GenerationRequest) {
@@ -32,6 +37,7 @@ export async function runCampaignImageGeneration(input: GenerationRequest) {
 
   const campaign = detail.campaign;
   const products = detail.products;
+  const persona = input.personaId ? await getPersonaFromConvex(input.personaId) : null;
   if (products.length === 0) {
     throw new Error("Campaign has no synced products attached.");
   }
@@ -64,19 +70,39 @@ export async function runCampaignImageGeneration(input: GenerationRequest) {
     },
     brief: latestBrief,
     products,
+    persona: persona
+      ? {
+          name: persona.name,
+          archetype: persona.archetype,
+          ageBand: persona.ageBand,
+          genderPresentation: persona.genderPresentation,
+          styleNotes: persona.styleNotes,
+          physicalFeatures: persona.physicalFeatures,
+          referenceImageUrl: persona.referenceImageUrl,
+        }
+      : undefined,
+    useCase: input.useCase,
     imageSize: input.imageSize,
     aspectRatio: input.aspectRatio,
     size: input.size,
   });
 
+  const promptSpec = {
+    useCase: input.useCase ?? "product-highlight",
+    personaId: persona?._id,
+  };
+
   const requestedModel = input.model || defaultModelForProvider(input.provider);
   const jobId = await createGenerationJobInConvex({
     campaignId: campaign._id,
     briefId: detail.briefs[0]?._id,
+    personaId: persona?._id,
     type: "image",
+    useCase: input.useCase,
     provider: input.provider,
     model: requestedModel,
     prompt,
+    promptSpec,
     sourceProductSkus: campaign.productSkus,
   });
 
@@ -92,7 +118,10 @@ export async function runCampaignImageGeneration(input: GenerationRequest) {
       imageSize: input.imageSize,
       quality: input.quality,
       background: input.background,
-      referenceImages: await getReferenceImagesAsDataUrls(products),
+      referenceImages: await getReferenceImagesAsDataUrls(
+        products,
+        persona?.referenceImageUrl,
+      ),
     });
 
     const resolved = await resolveImageBinary(result);
@@ -111,6 +140,7 @@ export async function runCampaignImageGeneration(input: GenerationRequest) {
     const assetId = await createAssetInConvex({
       campaignId: campaign._id,
       generationJobId: jobId,
+      personaId: persona?._id,
       kind: "image",
       provider: result.provider,
       model: result.model,
@@ -121,6 +151,13 @@ export async function runCampaignImageGeneration(input: GenerationRequest) {
       aspectRatio: input.aspectRatio,
       mimeType: resolved.mimeType,
     });
+
+    if (persona?._id && input.useCase === "persona-editorial") {
+      await attachPersonaReferenceImageInConvex({
+        personaId: persona._id,
+        referenceImageUrl: upload.publicUrl,
+      });
+    }
 
     await markGenerationJobCompletedInConvex(jobId);
 
@@ -170,14 +207,20 @@ async function getReferenceImagesAsDataUrls(
     referenceImages: string[];
     productImages: string[];
   }>,
+  personaReferenceImageUrl?: string,
 ) {
   const urls = products
     .flatMap((product) => [...product.referenceImages, ...product.productImages])
-    .filter(Boolean)
-    .slice(0, 2);
+    .filter(Boolean);
+
+  if (personaReferenceImageUrl) {
+    urls.unshift(personaReferenceImageUrl);
+  }
+
+  const trimmed = urls.slice(0, 3);
 
   const images = await Promise.all(
-    urls.map(async (url) => {
+    trimmed.map(async (url) => {
       try {
         const response = await fetch(url);
         if (!response.ok) {

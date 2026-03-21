@@ -27,6 +27,43 @@ export async function listCampaignsFromConvex(limit = 20) {
   return client.query(api.campaigns.list, { limit });
 }
 
+export async function listPersonasFromConvex(limit = 24) {
+  const client = getConvexServerClient();
+  return client.query(api.personas.list, { limit });
+}
+
+export async function getPersonaFromConvex(personaId: string) {
+  const client = getConvexServerClient();
+  return client.query(api.personas.getById, {
+    personaId: personaId as never,
+  });
+}
+
+export async function createPersonaInConvex(args: {
+  name: string;
+  locale: string;
+  ageBand?: string;
+  genderPresentation?: string;
+  archetype?: string;
+  styleNotes: string[];
+  physicalFeatures: string[];
+  referenceImageUrl?: string;
+}) {
+  const client = getConvexServerClient();
+  return client.mutation(api.personas.create, args);
+}
+
+export async function attachPersonaReferenceImageInConvex(args: {
+  personaId: string;
+  referenceImageUrl: string;
+}) {
+  const client = getConvexServerClient();
+  return client.mutation(api.personas.attachReferenceImage, {
+    personaId: args.personaId as never,
+    referenceImageUrl: args.referenceImageUrl,
+  });
+}
+
 export async function createCampaignWithBriefInConvex(args: {
   name: string;
   objective: string;
@@ -52,10 +89,13 @@ export async function getCampaignDetailFromConvex(campaignId: string) {
 export async function createGenerationJobInConvex(args: {
   campaignId?: string;
   briefId?: string;
+  personaId?: string;
   type: string;
+  useCase?: string;
   provider: string;
   model: string;
   prompt: string;
+  promptSpec?: unknown;
   sourceProductSkus: string[];
 }) {
   const client = getConvexServerClient();
@@ -63,6 +103,7 @@ export async function createGenerationJobInConvex(args: {
     ...args,
     campaignId: args.campaignId as never,
     briefId: args.briefId as never,
+    personaId: args.personaId as never,
   });
 }
 
@@ -94,6 +135,7 @@ export async function markGenerationJobFailedInConvex(args: {
 export async function createAssetInConvex(args: {
   campaignId?: string;
   generationJobId?: string;
+  personaId?: string;
   kind: string;
   provider: string;
   model: string;
@@ -111,5 +153,6 @@ export async function createAssetInConvex(args: {
     ...args,
     campaignId: args.campaignId as never,
     generationJobId: args.generationJobId as never,
+    personaId: args.personaId as never,
   });
 }

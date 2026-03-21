@@ -9,6 +9,7 @@ import {
   openAiSupportedImageSizes,
   seedreamSupportedPixelSizes,
 } from "@/lib/image-providers";
+import { promptUseCaseOptions } from "@/lib/prompt-system";
 
 export default async function CampaignDetailPage({
   params,
@@ -25,6 +26,7 @@ export default async function CampaignDetailPage({
   const latestBrief = detail.briefs[0]?.briefJson;
   const assets = detail.assets;
   const products = detail.products;
+  const personas = detail.personas;
   const heroAsset = assets[0];
   const secondaryAssets = assets.slice(1, 6);
 
@@ -151,7 +153,21 @@ export default async function CampaignDetailPage({
                   "Render the next campaign variant from the saved brief."}
               </div>
 
-              <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-5">
+              <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-6">
+                <ComposerField>
+                  <select
+                    name="useCase"
+                    defaultValue="product-highlight"
+                    className="h-11 rounded-[16px] border border-white/8 bg-black/18 px-3 text-sm text-white outline-none"
+                  >
+                    {promptUseCaseOptions.map((option) => (
+                      <option key={option} value={option} className="bg-[var(--color-panel)]">
+                        {option}
+                      </option>
+                    ))}
+                  </select>
+                </ComposerField>
+
                 <ComposerField>
                   <select
                     name="provider"
@@ -161,6 +177,27 @@ export default async function CampaignDetailPage({
                     <option value="gemini" className="bg-[var(--color-panel)]">Gemini</option>
                     <option value="openai" className="bg-[var(--color-panel)]">OpenAI</option>
                     <option value="seedream" className="bg-[var(--color-panel)]">Seedream</option>
+                  </select>
+                </ComposerField>
+
+                <ComposerField>
+                  <select
+                    name="personaId"
+                    defaultValue=""
+                    className="h-11 rounded-[16px] border border-white/8 bg-black/18 px-3 text-sm text-white outline-none"
+                  >
+                    <option value="" className="bg-[var(--color-panel)]">
+                      No persona
+                    </option>
+                    {personas.map((persona) => (
+                      <option
+                        key={persona._id}
+                        value={persona._id}
+                        className="bg-[var(--color-panel)]"
+                      >
+                        {persona.name}
+                      </option>
+                    ))}
                   </select>
                 </ComposerField>
 

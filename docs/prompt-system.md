@@ -50,6 +50,7 @@ Core fields:
 - `constraints`
 - `negativeAvoidance`
 - `references`
+- `persona`
 - `editInstructions`
 
 ## Provider Rendering Strategy
@@ -109,9 +110,13 @@ This follows the model guidance that shorter and more front-loaded prompts perfo
 The generation flow now:
 
 1. reads campaign and product context
-2. builds the internal prompt spec
-3. renders a provider-specific prompt
-4. sends the rendered prompt to the selected model
+2. optionally reads a selected persona profile
+3. builds the internal prompt spec
+4. stores prompt metadata with the generation job
+5. renders a provider-specific prompt
+6. sends the rendered prompt to the selected model
+
+For persona-editorial generations, the generated asset can become the persona reference image automatically so that later try-on flows have a reusable visual anchor.
 
 Files:
 
@@ -121,11 +126,10 @@ Files:
 
 ## Next Prompt-System Steps
 
-- add UI selection for `useCase`
-- add persona profile records for model-led generation
+- add UI selection for `useCase` during campaign creation
 - add structured text overlay controls
 - add explicit edit flows for try-on and background replacement
-- persist the internal prompt spec with generation jobs for auditability
+- persist the full internal prompt spec with generation jobs for auditability
 
 ## Source Guides
 

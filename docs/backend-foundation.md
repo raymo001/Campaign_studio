@@ -12,6 +12,7 @@ Date: March 21, 2026
 - `briefs`
 - `generationJobs`
 - `assets`
+- `personas`
 
 Defined in [convex/schema.ts](/Users/biatyraymond/Documents/Campaign_Studio/convex/schema.ts).
 
@@ -46,7 +47,9 @@ These provide server-side helpers for:
 
 - querying products
 - querying campaigns
+- querying personas
 - creating campaigns with their initial brief
+- creating persona records
 - reading campaign detail with briefs, jobs, assets, and linked products
 - reading sync summary
 - triggering manual sync
@@ -68,6 +71,9 @@ Behavior:
 - the brief is generated from synced product data and campaign inputs
 - generation now builds an internal prompt spec before rendering a provider-specific prompt
 - the prompt system supports product highlight, try-on, and persona-editorial use cases
+- personas can now be created and reused during generation
+- generation jobs can now store `useCase`, `personaId`, and prompt metadata
+- persona-editorial generations can automatically update the persona reference image for later try-on use
 - `/campaigns/[campaignId]` reads the full campaign detail model from Convex
 - generation creates a job record, runs the chosen provider, uploads the image to R2, then stores the asset record in Convex
 - failed generations are written back to `generationJobs.errorMessage`
@@ -96,6 +102,7 @@ Supporting product routes are also in place:
 - [src/app/assets/page.tsx](/Users/biatyraymond/Documents/Campaign_Studio/src/app/assets/page.tsx)
 - [src/app/templates/page.tsx](/Users/biatyraymond/Documents/Campaign_Studio/src/app/templates/page.tsx)
 - [src/app/brand/page.tsx](/Users/biatyraymond/Documents/Campaign_Studio/src/app/brand/page.tsx)
+- [src/app/personas/page.tsx](/Users/biatyraymond/Documents/Campaign_Studio/src/app/personas/page.tsx)
 - [src/app/settings/page.tsx](/Users/biatyraymond/Documents/Campaign_Studio/src/app/settings/page.tsx)
 - [src/app/tutorials/page.tsx](/Users/biatyraymond/Documents/Campaign_Studio/src/app/tutorials/page.tsx)
 
@@ -116,6 +123,7 @@ Files:
 - [tests/feed.test.ts](/Users/biatyraymond/Documents/Campaign_Studio/tests/feed.test.ts)
 - [tests/image-providers.test.ts](/Users/biatyraymond/Documents/Campaign_Studio/tests/image-providers.test.ts)
 - [tests/campaign-workflow.test.ts](/Users/biatyraymond/Documents/Campaign_Studio/tests/campaign-workflow.test.ts)
+- [tests/prompt-system.test.ts](/Users/biatyraymond/Documents/Campaign_Studio/tests/prompt-system.test.ts)
 
 Run with:
 

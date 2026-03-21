@@ -48,6 +48,14 @@ export const primaryNavigation = [
       "Brand palette and creative rules.",
   },
   {
+    href: "/personas",
+    label: "Personas",
+    icon: "user",
+    short: "Personas",
+    description:
+      "Reusable persona profiles for model-led and try-on generation.",
+  },
+  {
     href: "/settings",
     label: "Settings",
     icon: "sliders",

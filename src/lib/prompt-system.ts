@@ -54,6 +54,15 @@ export type InternalPromptSpec = {
   constraints: string[];
   negativeAvoidance: string[];
   references: PromptReferenceImage[];
+  persona?: {
+    name: string;
+    archetype?: string;
+    ageBand?: string;
+    genderPresentation?: string;
+    styleNotes: string[];
+    physicalFeatures: string[];
+    referenceImageUrl?: string;
+  };
   editInstructions?: {
     change: string[];
     preserve: string[];
@@ -82,6 +91,15 @@ export function buildInternalPromptSpec(args: {
     };
   };
   products: PromptProduct[];
+  persona?: {
+    name: string;
+    archetype?: string;
+    ageBand?: string;
+    genderPresentation?: string;
+    styleNotes: string[];
+    physicalFeatures: string[];
+    referenceImageUrl?: string;
+  };
   useCase?: PromptUseCase;
   aspectRatio?: string;
   imageSize?: string;
@@ -129,6 +147,7 @@ export function buildInternalPromptSpec(args: {
     constraints: buildConstraints(useCase),
     negativeAvoidance: buildNegativeAvoidance(useCase),
     references: buildReferences(useCase, args.products),
+    persona: args.persona,
   };
 
   if (useCase === "try-on" || useCase === "persona-editorial") {
@@ -171,6 +190,7 @@ function renderGeminiPrompt(spec: InternalPromptSpec) {
     `Lighting: ${spec.lighting}.`,
     `Style: ${spec.style.join(" ")}.`,
     `Brand tone: ${spec.brandTone.join(" ")}.`,
+    spec.persona ? `Persona: ${buildPersonaDescriptor(spec.persona)}.` : undefined,
     spec.textOverlay?.headline ? `Headline text: ${spec.textOverlay.headline}.` : undefined,
     spec.textOverlay?.cta ? `CTA text: ${spec.textOverlay.cta}.` : undefined,
     spec.aspectRatio ? `Aspect ratio: ${spec.aspectRatio}.` : undefined,
@@ -195,6 +215,7 @@ function renderOpenAiPrompt(spec: InternalPromptSpec) {
     `Lighting: ${spec.lighting}.`,
     `Style: ${spec.style.join(" ")}.`,
     `Brand tone: ${spec.brandTone.join(" ")}.`,
+    spec.persona ? `Persona: ${buildPersonaDescriptor(spec.persona)}.` : undefined,
     spec.textOverlay?.headline ? `Text headline: ${spec.textOverlay.headline}.` : undefined,
     spec.textOverlay?.body ? `Text body: ${spec.textOverlay.body}.` : undefined,
     spec.textOverlay?.cta ? `Text CTA: ${spec.textOverlay.cta}.` : undefined,
@@ -211,6 +232,7 @@ function renderOpenAiPrompt(spec: InternalPromptSpec) {
 function renderSeedreamPrompt(spec: InternalPromptSpec) {
   return [
     spec.subject,
+    spec.persona ? buildPersonaDescriptor(spec.persona) : undefined,
     spec.productFocus.join("; "),
     spec.setting,
     spec.actionOrPose,
@@ -349,6 +371,17 @@ function buildReferences(useCase: PromptUseCase, products: PromptProduct[]) {
   }
 
   return references.slice(0, 4);
+}
+
+function buildPersonaDescriptor(persona: NonNullable<InternalPromptSpec["persona"]>) {
+  return uniqueValues([
+    persona.name,
+    persona.archetype,
+    persona.ageBand,
+    persona.genderPresentation,
+    ...persona.styleNotes,
+    ...persona.physicalFeatures,
+  ]).join(", ");
 }
 
 function buildProductDescriptor(product: PromptProduct) {

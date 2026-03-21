@@ -110,12 +110,15 @@ export const getDetail = query({
       )
     ).filter((product) => product !== null);
 
+    const personas = await ctx.db.query("personas").order("desc").take(24);
+
     return {
       campaign,
       briefs,
       generationJobs,
       assets,
       products,
+      personas,
     };
   },
 });
@@ -143,10 +146,13 @@ export const createGenerationJob = mutation({
   args: {
     campaignId: v.optional(v.id("campaigns")),
     briefId: v.optional(v.id("briefs")),
+    personaId: v.optional(v.id("personas")),
     type: v.string(),
+    useCase: v.optional(v.string()),
     provider: v.string(),
     model: v.string(),
     prompt: v.string(),
+    promptSpec: v.optional(v.any()),
     sourceProductSkus: v.array(v.string()),
   },
   handler: async (ctx, args) => {
@@ -202,6 +208,7 @@ export const createAsset = mutation({
   args: {
     campaignId: v.optional(v.id("campaigns")),
     generationJobId: v.optional(v.id("generationJobs")),
+    personaId: v.optional(v.id("personas")),
     kind: v.string(),
     provider: v.string(),
     model: v.string(),
