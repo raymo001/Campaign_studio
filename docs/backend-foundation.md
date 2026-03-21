@@ -87,6 +87,17 @@ Pages now read real Convex data:
 - [src/app/campaigns/new/page.tsx](/Users/biatyraymond/Documents/Campaign_Studio/src/app/campaigns/new/page.tsx)
 - [src/app/campaigns/[campaignId]/page.tsx](/Users/biatyraymond/Documents/Campaign_Studio/src/app/campaigns/[campaignId]/page.tsx)
 
+Supporting product routes are also in place:
+
+- [src/app/page.tsx](/Users/biatyraymond/Documents/Campaign_Studio/src/app/page.tsx)
+- [src/app/assets/page.tsx](/Users/biatyraymond/Documents/Campaign_Studio/src/app/assets/page.tsx)
+- [src/app/templates/page.tsx](/Users/biatyraymond/Documents/Campaign_Studio/src/app/templates/page.tsx)
+- [src/app/brand/page.tsx](/Users/biatyraymond/Documents/Campaign_Studio/src/app/brand/page.tsx)
+- [src/app/settings/page.tsx](/Users/biatyraymond/Documents/Campaign_Studio/src/app/settings/page.tsx)
+- [src/app/tutorials/page.tsx](/Users/biatyraymond/Documents/Campaign_Studio/src/app/tutorials/page.tsx)
+
+The current UI baseline keeps product surfaces short and operational, with instructional content isolated to the tutorials route instead of mixed into the workflow screens.
+
 ## Tests
 
 Test coverage currently focuses on:

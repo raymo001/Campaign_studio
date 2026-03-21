@@ -1,6 +1,5 @@
 import Image from "next/image";
 import { notFound } from "next/navigation";
-import { Panel } from "@/components/panel";
 import { generateCampaignImageAction } from "@/app/campaigns/actions";
 import { getCampaignDetailFromConvex } from "@/lib/convex-server";
 import {
@@ -25,230 +24,285 @@ export default async function CampaignDetailPage({
 
   const latestBrief = detail.briefs[0]?.briefJson;
   const assets = detail.assets;
-  const jobs = detail.generationJobs;
   const products = detail.products;
+  const heroAsset = assets[0];
+  const secondaryAssets = assets.slice(1, 6);
 
   return (
-    <div className="px-5 py-5 sm:px-8 lg:px-10">
-      <div className="grid gap-4">
-        <Panel
-          eyebrow="Campaign Detail"
-          title={detail.campaign.name}
-          description="Brief lineage, product context, generation controls, and asset history are all grounded in Convex."
-        >
-          <div className="mt-6 grid gap-4 xl:grid-cols-[1.15fr_0.85fr]">
-            <div className="grid gap-4">
-              <div className="rounded-[24px] border border-white/6 bg-black/18 p-5">
-                <div className="flex flex-wrap items-center justify-between gap-3">
-                  <div>
-                    <div className="eyebrow">Structured Brief</div>
-                    <div className="mt-2 text-sm text-[var(--color-soft)]">
-                      {detail.briefs.length} saved brief version{detail.briefs.length === 1 ? "" : "s"}
-                    </div>
-                  </div>
-                  <span className="rounded-full border border-[var(--color-orange)]/25 bg-[var(--color-orange-soft)] px-3 py-1 text-xs font-bold uppercase tracking-[0.16em] text-[var(--color-orange)]">
-                    {detail.campaign.status}
-                  </span>
-                </div>
-
-                {latestBrief ? (
-                  <div className="mt-5 grid gap-4 text-sm text-white/88">
-                    <div className="rounded-[20px] border border-white/6 bg-white/3 px-4 py-4">
-                      <div className="eyebrow">Proposition</div>
-                      <p className="mt-3 leading-6">{latestBrief.proposition}</p>
-                    </div>
-                    <div className="grid gap-4 md:grid-cols-2">
-                      <div className="rounded-[20px] border border-white/6 bg-white/3 px-4 py-4">
-                        <div className="eyebrow">Visual Direction</div>
-                        <p className="mt-3 leading-6">{latestBrief.creativeDirection?.visualStyle}</p>
-                        <div className="mt-3 text-[var(--color-soft)]">
-                          {latestBrief.creativeDirection?.compositionRules?.join(" ")}
-                        </div>
-                      </div>
-                      <div className="rounded-[20px] border border-white/6 bg-white/3 px-4 py-4">
-                        <div className="eyebrow">Copy Direction</div>
-                        <p className="mt-3 leading-6">{latestBrief.copyDirection?.hook}</p>
-                        <div className="mt-3 text-[var(--color-soft)]">
-                          CTA: {latestBrief.copyDirection?.callToAction}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                ) : (
-                  <div className="mt-5 rounded-[20px] border border-dashed border-white/10 px-4 py-6 text-sm text-[var(--color-soft)]">
-                    No brief has been stored for this campaign yet.
-                  </div>
-                )}
+    <div className="mx-auto max-w-[1760px] px-5 pb-32 pt-6 sm:px-7 lg:px-9">
+      <div className="grid gap-6">
+        <header className="flex flex-col gap-5">
+          <div className="flex flex-wrap items-start justify-between gap-4">
+            <div className="max-w-4xl">
+              <div className="mb-3 text-[11px] uppercase tracking-[0.24em] text-white/26">
+                Campaign
               </div>
-
-              <div className="rounded-[24px] border border-white/6 bg-black/18 p-5">
-                <div className="eyebrow">Asset Review Grid</div>
-                <div className="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
-                  {assets.length === 0 ? (
-                    <div className="rounded-[20px] border border-dashed border-white/10 px-4 py-10 text-sm text-[var(--color-soft)] sm:col-span-2 xl:col-span-3">
-                      No generated assets yet. Use the generation form to create the first R2-backed image.
-                    </div>
-                  ) : null}
-                  {assets.map((asset) => (
-                    <div
-                      key={asset._id}
-                      className="rounded-[20px] border border-white/8 bg-[linear-gradient(180deg,rgba(35,100,84,0.22),rgba(255,255,255,0.03))] p-3"
-                    >
-                      {asset.publicUrl ? (
-                        <Image
-                          src={asset.publicUrl}
-                          alt={asset.kind}
-                          width={900}
-                          height={1125}
-                          unoptimized
-                          className="aspect-[4/5] w-full rounded-[16px] object-cover"
-                        />
-                      ) : (
-                        <div className="aspect-[4/5] rounded-[16px] bg-black/20" />
-                      )}
-                      <div className="mt-3 flex items-center justify-between text-xs uppercase tracking-[0.14em] text-[var(--color-soft)]">
-                        <span>{asset.provider}</span>
-                        <span>{asset.status}</span>
-                      </div>
-                      <div className="mt-2 text-xs text-white/70">
-                        {asset.aspectRatio || asset.mimeType || "image"}
-                      </div>
-                    </div>
-                  ))}
-                </div>
+              <div className="flex flex-wrap items-center gap-3">
+                <h1 className="text-4xl font-semibold tracking-[-0.045em] text-white sm:text-5xl">
+                  {detail.campaign.name}
+                </h1>
+                <span className="rounded-full border border-[rgba(58,147,122,0.5)] bg-[rgba(31,102,86,0.16)] px-3 py-1 text-[11px] uppercase tracking-[0.18em] text-[#8ecfbd]">
+                  {detail.campaign.status}
+                </span>
               </div>
+              <p className="mt-4 max-w-3xl text-base leading-7 text-white/44">
+                {latestBrief?.proposition ||
+                  "Product-grounded campaign space for fast creative iteration."}
+              </p>
             </div>
 
-            <div className="grid gap-4">
-              <div className="rounded-[24px] border border-white/6 bg-[var(--color-panel)] p-5">
-                <div className="eyebrow">Products</div>
-                <div className="mt-4 grid gap-2">
-                  {products.map((product) => (
-                    <div
-                      key={product._id}
-                      className="rounded-2xl border border-white/6 bg-white/3 px-4 py-3 text-sm text-white/88"
-                    >
-                      <div className="font-semibold text-white">{product.name}</div>
-                      <div className="mt-1 text-xs uppercase tracking-[0.14em] text-[var(--color-soft)]">
-                        {product.sku}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              <div className="rounded-[24px] border border-white/6 bg-[var(--color-panel)] p-5">
-                <div className="eyebrow">Generate Image</div>
-                <form action={generateCampaignImageAction} className="mt-4 grid gap-3">
-                  <input type="hidden" name="campaignId" value={detail.campaign._id} />
-
-                  <label className="grid gap-2 text-sm">
-                    <span className="text-white/88">Provider</span>
-                    <select
-                      name="provider"
-                      defaultValue="gemini"
-                      className="rounded-2xl border border-white/10 bg-black/20 px-4 py-3 text-sm text-white outline-none"
-                    >
-                      <option value="gemini" className="bg-[var(--color-panel)]">Gemini</option>
-                      <option value="openai" className="bg-[var(--color-panel)]">OpenAI</option>
-                      <option value="seedream" className="bg-[var(--color-panel)]">Seedream</option>
-                    </select>
-                  </label>
-
-                  <label className="grid gap-2 text-sm">
-                    <span className="text-white/88">Model override</span>
-                    <input
-                      name="model"
-                      placeholder={`Gemini: ${getGeminiImageModels().join(", ")}`}
-                      className="rounded-2xl border border-white/10 bg-black/20 px-4 py-3 text-sm text-white outline-none"
-                    />
-                  </label>
-
-                  <label className="grid gap-2 text-sm">
-                    <span className="text-white/88">Aspect ratio</span>
-                    <select
-                      name="aspectRatio"
-                      defaultValue={latestBrief?.generationDefaults?.aspectRatio || "4:5"}
-                      className="rounded-2xl border border-white/10 bg-black/20 px-4 py-3 text-sm text-white outline-none"
-                    >
-                      {geminiSupportedAspectRatios.map((ratio) => (
-                        <option key={ratio} value={ratio} className="bg-[var(--color-panel)]">
-                          {ratio}
-                        </option>
-                      ))}
-                    </select>
-                  </label>
-
-                  <label className="grid gap-2 text-sm">
-                    <span className="text-white/88">Gemini resolution</span>
-                    <select
-                      name="imageSize"
-                      defaultValue={latestBrief?.generationDefaults?.imageSize || "2K"}
-                      className="rounded-2xl border border-white/10 bg-black/20 px-4 py-3 text-sm text-white outline-none"
-                    >
-                      {geminiSupportedImageSizes.map((size) => (
-                        <option key={size} value={size} className="bg-[var(--color-panel)]">
-                          {size}
-                        </option>
-                      ))}
-                    </select>
-                  </label>
-
-                  <label className="grid gap-2 text-sm">
-                    <span className="text-white/88">Pixel size for OpenAI / Seedream</span>
-                    <input
-                      name="size"
-                      placeholder={`OpenAI: ${openAiSupportedImageSizes.join(", ")} | Seedream: ${seedreamSupportedPixelSizes[0]}...`}
-                      className="rounded-2xl border border-white/10 bg-black/20 px-4 py-3 text-sm text-white outline-none"
-                    />
-                  </label>
-
-                  <button
-                    type="submit"
-                    className="rounded-full bg-[var(--color-orange)] px-5 py-3 text-sm font-semibold text-white"
-                  >
-                    Generate Asset
-                  </button>
-                </form>
-              </div>
-
-              <div className="rounded-[24px] border border-white/6 bg-[var(--color-panel)] p-5">
-                <div className="eyebrow">Generation Jobs</div>
-                <div className="mt-4 grid gap-3">
-                  {jobs.length === 0 ? (
-                    <div className="rounded-2xl border border-dashed border-white/10 px-4 py-4 text-sm text-[var(--color-soft)]">
-                      No generation jobs yet.
-                    </div>
-                  ) : null}
-                  {jobs.map((job) => (
-                    <div
-                      key={job._id}
-                      className="rounded-2xl border border-white/6 bg-white/3 px-4 py-4 text-sm"
-                    >
-                      <div className="flex items-center justify-between gap-3">
-                        <div className="font-semibold text-white">
-                          {job.provider} / {job.model}
-                        </div>
-                        <span className="text-xs uppercase tracking-[0.14em] text-[var(--color-soft)]">
-                          {job.status}
-                        </span>
-                      </div>
-                      <div className="mt-2 line-clamp-4 text-[var(--color-soft)]">
-                        {job.prompt}
-                      </div>
-                      {job.errorMessage ? (
-                        <div className="mt-3 text-xs text-[var(--color-orange)]">
-                          {job.errorMessage}
-                        </div>
-                      ) : null}
-                    </div>
-                  ))}
-                </div>
-              </div>
+            <div className="flex flex-wrap gap-2 text-[11px] uppercase tracking-[0.18em] text-white/32">
+              <Chip>{detail.campaign.objective}</Chip>
+              <Chip>{detail.campaign.primaryPlatform}</Chip>
+              <Chip>{detail.campaign.locale}</Chip>
+              <Chip>{assets.length} assets</Chip>
             </div>
           </div>
-        </Panel>
+
+          <div className="flex flex-wrap items-center gap-2 text-sm text-white/48">
+            {products.map((product) => (
+              <span
+                key={product._id}
+                className="rounded-full border border-white/7 bg-white/[0.02] px-3 py-1.5"
+              >
+                {product.name}
+              </span>
+            ))}
+          </div>
+        </header>
+
+        <main className="grid gap-4 xl:grid-cols-[minmax(0,1.45fr)_minmax(320px,0.75fr)]">
+          <section className="grid gap-4">
+            {assets.length === 0 ? (
+              <div className="surface-muted flex min-h-[620px] items-center justify-center rounded-[30px] text-sm text-white/34">
+                Generate the first asset to populate the board.
+              </div>
+            ) : (
+              <div className="grid auto-rows-[240px] gap-4 lg:grid-cols-2 2xl:grid-cols-3">
+                <AssetTile asset={heroAsset} hero />
+                {secondaryAssets.map((asset) => (
+                  <AssetTile key={asset._id} asset={asset} />
+                ))}
+              </div>
+            )}
+          </section>
+
+          <aside className="grid gap-4 xl:pt-1">
+            <div className="rounded-[28px] border border-white/6 bg-white/[0.018] px-5 py-5">
+              <div className="text-[11px] uppercase tracking-[0.22em] text-white/28">
+                Brief direction
+              </div>
+              <div className="mt-4 grid gap-4">
+                <MetaBlock
+                  label="Visual"
+                  value={latestBrief?.creativeDirection?.visualStyle}
+                />
+                <MetaBlock
+                  label="Hook"
+                  value={latestBrief?.copyDirection?.hook}
+                />
+                <MetaBlock
+                  label="CTA"
+                  value={latestBrief?.copyDirection?.callToAction}
+                />
+              </div>
+            </div>
+
+            <div className="rounded-[28px] border border-white/6 bg-white/[0.018] px-5 py-5">
+              <div className="text-[11px] uppercase tracking-[0.22em] text-white/28">
+                Recent output
+              </div>
+              <div className="mt-4 grid gap-3">
+                {assets.slice(0, 3).map((asset) => (
+                  <div
+                    key={asset._id}
+                    className="flex items-center justify-between rounded-[20px] border border-white/6 bg-black/14 px-4 py-3"
+                  >
+                    <div>
+                      <div className="text-sm font-medium text-white/88">
+                        {asset.provider}
+                      </div>
+                      <div className="mt-1 text-[11px] uppercase tracking-[0.18em] text-white/26">
+                        {asset.aspectRatio || "image"}
+                      </div>
+                    </div>
+                    <div className="text-[11px] uppercase tracking-[0.18em] text-white/34">
+                      {asset.status}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </aside>
+        </main>
+      </div>
+
+      <div className="fixed inset-x-0 bottom-4 z-30 flex justify-center px-4">
+        <form
+          action={generateCampaignImageAction}
+          className="w-full max-w-[960px] rounded-[30px] border border-white/7 bg-[rgba(16,18,17,0.94)] p-4 shadow-[0_30px_90px_rgba(0,0,0,0.45)] backdrop-blur-xl"
+        >
+          <input type="hidden" name="campaignId" value={detail.campaign._id} />
+
+          <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end">
+            <div className="grid gap-3">
+              <div className="text-base leading-7 text-white/78">
+                {latestBrief?.copyDirection?.hook ||
+                  "Render the next campaign variant from the saved brief."}
+              </div>
+
+              <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-5">
+                <ComposerField>
+                  <select
+                    name="provider"
+                    defaultValue="gemini"
+                    className="h-11 rounded-[16px] border border-white/8 bg-black/18 px-3 text-sm text-white outline-none"
+                  >
+                    <option value="gemini" className="bg-[var(--color-panel)]">Gemini</option>
+                    <option value="openai" className="bg-[var(--color-panel)]">OpenAI</option>
+                    <option value="seedream" className="bg-[var(--color-panel)]">Seedream</option>
+                  </select>
+                </ComposerField>
+
+                <ComposerField>
+                  <input
+                    name="model"
+                    placeholder={getGeminiImageModels()[0]}
+                    className="h-11 rounded-[16px] border border-white/8 bg-black/18 px-3 text-sm text-white outline-none"
+                  />
+                </ComposerField>
+
+                <ComposerField>
+                  <select
+                    name="aspectRatio"
+                    defaultValue={latestBrief?.generationDefaults?.aspectRatio || "4:5"}
+                    className="h-11 rounded-[16px] border border-white/8 bg-black/18 px-3 text-sm text-white outline-none"
+                  >
+                    {geminiSupportedAspectRatios.map((ratio) => (
+                      <option key={ratio} value={ratio} className="bg-[var(--color-panel)]">
+                        {ratio}
+                      </option>
+                    ))}
+                  </select>
+                </ComposerField>
+
+                <ComposerField>
+                  <select
+                    name="imageSize"
+                    defaultValue={latestBrief?.generationDefaults?.imageSize || "2K"}
+                    className="h-11 rounded-[16px] border border-white/8 bg-black/18 px-3 text-sm text-white outline-none"
+                  >
+                    {geminiSupportedImageSizes.map((size) => (
+                      <option key={size} value={size} className="bg-[var(--color-panel)]">
+                        {size}
+                      </option>
+                    ))}
+                  </select>
+                </ComposerField>
+
+                <ComposerField>
+                  <input
+                    name="size"
+                    placeholder={`${openAiSupportedImageSizes[0]} / ${seedreamSupportedPixelSizes[0]}`}
+                    className="h-11 rounded-[16px] border border-white/8 bg-black/18 px-3 text-sm text-white outline-none"
+                  />
+                </ComposerField>
+              </div>
+            </div>
+
+            <button
+              type="submit"
+              className="h-14 min-w-[184px] rounded-[20px] bg-[var(--color-orange)] px-6 text-base font-semibold text-white shadow-[0_18px_44px_rgba(254,104,22,0.28)] transition hover:brightness-105"
+            >
+              Create
+            </button>
+          </div>
+        </form>
       </div>
     </div>
+  );
+}
+
+function AssetTile({
+  asset,
+  hero = false,
+}: {
+  asset:
+    | {
+        _id: string;
+        publicUrl?: string;
+        provider: string;
+        status: string;
+        aspectRatio?: string;
+      }
+    | undefined;
+  hero?: boolean;
+}) {
+  if (!asset) {
+    return (
+      <div className="surface-muted flex min-h-[240px] items-center justify-center rounded-[28px] text-sm text-white/32">
+        Awaiting asset
+      </div>
+    );
+  }
+
+  return (
+    <article
+      className={`group relative overflow-hidden rounded-[28px] bg-[#0a0c0b] ${
+        hero ? "lg:col-span-2 lg:row-span-2 2xl:col-span-2" : ""
+      }`}
+    >
+      {asset.publicUrl ? (
+        <Image
+          src={asset.publicUrl}
+          alt={asset.provider}
+          fill
+          priority={hero}
+          unoptimized
+          className="object-cover transition duration-500 group-hover:scale-[1.015]"
+        />
+      ) : null}
+      <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(0,0,0,0.04),rgba(0,0,0,0.16)_42%,rgba(0,0,0,0.74))]" />
+      <div className="absolute inset-x-0 bottom-0 flex items-end justify-between gap-3 p-4">
+        <div>
+          <div className="text-[11px] uppercase tracking-[0.2em] text-white/38">
+            {asset.provider}
+          </div>
+          <div className="mt-2 text-xs text-white/68">{asset.aspectRatio || "image"}</div>
+        </div>
+        <div className="text-[11px] uppercase tracking-[0.18em] text-white/58">
+          {asset.status}
+        </div>
+      </div>
+    </article>
+  );
+}
+
+function MetaBlock({
+  label,
+  value,
+}: {
+  label: string;
+  value?: string;
+}) {
+  return (
+    <div className="rounded-[22px] border border-white/6 bg-black/12 px-4 py-4">
+      <div className="text-[11px] uppercase tracking-[0.18em] text-white/28">{label}</div>
+      <div className="mt-3 text-[15px] leading-7 text-white/76">{value || "Not set"}</div>
+    </div>
+  );
+}
+
+function ComposerField({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  return <div>{children}</div>;
+}
+
+function Chip({ children }: { children: React.ReactNode }) {
+  return (
+    <span className="rounded-full border border-white/7 px-3 py-1.5">{children}</span>
   );
 }

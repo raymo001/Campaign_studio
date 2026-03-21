@@ -1,102 +1,85 @@
 import Link from "next/link";
-import { Panel } from "@/components/panel";
 import { listCampaignsFromConvex } from "@/lib/convex-server";
 
 export default async function CampaignsPage() {
   const campaigns = await listCampaignsFromConvex(20).catch(() => []);
 
   return (
-    <div className="px-5 py-5 sm:px-8 lg:px-10">
-      <div className="grid gap-4">
-        <Panel
-          eyebrow="Route Wireframe"
-          title="Campaigns"
-          description="This page is the operating table for active work: status, owners, stage, and a fast path into creation."
-        >
-          <div className="mt-6 flex flex-wrap gap-3">
+    <div className="mx-auto max-w-[1600px] px-5 py-6 sm:px-7 lg:px-9">
+      <div className="grid gap-6">
+        <header className="flex flex-col gap-5 xl:flex-row xl:items-end xl:justify-between">
+          <div className="max-w-3xl">
+            <div className="eyebrow">Campaigns</div>
+            <h1 className="mt-3 text-4xl font-semibold tracking-[-0.04em] text-white sm:text-5xl">
+              All campaigns.
+            </h1>
+          </div>
+
+          <div className="flex flex-wrap gap-3">
             <Link
               href="/campaigns/new"
-              className="rounded-full bg-[var(--color-orange)] px-5 py-3 text-sm font-semibold text-white"
+              className="rounded-full bg-[var(--color-orange)] px-6 py-3 text-sm font-semibold text-white shadow-[0_18px_44px_rgba(254,104,22,0.24)]"
             >
-              Create Campaign
+              New Campaign
             </Link>
           </div>
-        </Panel>
+        </header>
 
-        <div className="grid gap-4 xl:grid-cols-[1.4fr_0.8fr]">
-          <Panel
-            eyebrow="Active List"
-            title="Current campaign board"
-            description="In the implemented product, this becomes a filterable data table or kanban view."
-          >
-            <div className="mt-6 grid gap-3">
-              {campaigns.length === 0 ? (
-                <div className="rounded-[24px] border border-dashed border-white/10 px-4 py-8 text-sm text-[var(--color-soft)]">
-                  No campaigns exist yet. Create one to persist a structured brief,
-                  generation jobs, and R2-backed assets.
-                </div>
-              ) : null}
-              {campaigns.map((campaign) => (
-                <div
-                  key={campaign._id}
-                  className="rounded-[24px] border border-white/6 bg-black/18 p-4"
-                >
-                  <div className="flex flex-wrap items-center justify-between gap-3">
-                    <Link
-                      href={`/campaigns/${campaign._id}`}
-                      className="text-lg font-semibold text-white hover:text-[var(--color-orange)]"
-                    >
-                      {campaign.name}
-                    </Link>
-                    <span className="rounded-full border border-[var(--color-orange)]/25 bg-[var(--color-orange-soft)] px-3 py-1 text-xs font-bold uppercase tracking-[0.16em] text-[var(--color-orange)]">
-                      {campaign.status}
-                    </span>
-                  </div>
-                  <div className="mt-4 grid gap-3 text-sm text-[var(--color-soft)] sm:grid-cols-3">
-                    <div>
-                      <div className="eyebrow">Objective</div>
-                      <div className="mt-2 text-white/88">{campaign.objective}</div>
-                    </div>
-                    <div>
-                      <div className="eyebrow">Platforms</div>
-                      <div className="mt-2 text-white/88">
-                        {campaign.platformMix.join(" / ")}
-                      </div>
-                    </div>
-                    <div>
-                      <div className="eyebrow">Locale</div>
-                      <div className="mt-2 text-white/88">{campaign.locale}</div>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </Panel>
-
-          <Panel
-            eyebrow="Sidebar"
-            title="Useful filters"
-            description="Keep filters short and operational. This should stay lighter than a full project-management interface."
-          >
-            <div className="mt-6 grid gap-3">
-              {[
-                "Objective",
-                "Platform",
-                "Locale",
-                "Collection",
-                "Stage",
-                "Last updated",
-              ].map((item) => (
-                <div
-                  key={item}
-                  className="rounded-[20px] border border-dashed border-white/10 px-4 py-4 text-sm text-white/80"
-                >
-                  {item}
-                </div>
-              ))}
-            </div>
-          </Panel>
+        <div className="flex flex-wrap gap-2 text-[11px] uppercase tracking-[0.18em] text-white/30">
+          {["All", "Awareness", "Sales", "Launch", "Review", "Instagram", "Pinterest"].map(
+            (item, index) => (
+              <span
+                key={item}
+                className={`rounded-full border px-3 py-1.5 ${
+                  index === 0
+                    ? "border-white/12 bg-white/[0.04] text-white/72"
+                    : "border-white/7 text-white/32"
+                }`}
+              >
+                {item}
+              </span>
+            ),
+          )}
         </div>
+
+        <section className="grid gap-3">
+          {campaigns.length === 0 ? (
+            <div className="rounded-[28px] border border-dashed border-white/10 px-5 py-12 text-center text-sm text-white/34">
+              No campaigns yet.
+            </div>
+          ) : null}
+          {campaigns.map((campaign) => (
+            <Link
+              key={campaign._id}
+              href={`/campaigns/${campaign._id}`}
+              className="rounded-[28px] border border-white/6 bg-white/[0.016] px-6 py-5 transition hover:border-white/12 hover:bg-white/[0.026]"
+            >
+              <div className="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
+                <div>
+                  <div className="text-2xl font-semibold tracking-[-0.03em] text-white">
+                    {campaign.name}
+                  </div>
+                  <div className="mt-2 text-sm text-white/36">{campaign.objective}</div>
+                </div>
+
+                <div className="flex flex-wrap gap-2 text-[11px] uppercase tracking-[0.18em] text-white/32">
+                  <span className="rounded-full border border-white/8 px-3 py-1.5">
+                    {campaign.status}
+                  </span>
+                  <span className="rounded-full border border-white/8 px-3 py-1.5">
+                    {campaign.primaryPlatform}
+                  </span>
+                  <span className="rounded-full border border-white/8 px-3 py-1.5">
+                    {campaign.locale}
+                  </span>
+                  <span className="rounded-full border border-white/8 px-3 py-1.5">
+                    {campaign.platformMix.length} placements
+                  </span>
+                </div>
+              </div>
+            </Link>
+          ))}
+        </section>
       </div>
     </div>
   );

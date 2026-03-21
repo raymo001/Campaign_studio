@@ -1,191 +1,167 @@
 import Link from "next/link";
-import { Panel } from "@/components/panel";
-import { primaryNavigation } from "@/lib/navigation";
 
 const metrics = [
-  { label: "Active Campaigns", value: "12", note: "Awareness to conversion" },
-  { label: "Products Synced", value: "46", note: "Live Vanpella feed" },
-  { label: "Draft Assets", value: "184", note: "Image + storyboard variants" },
-  { label: "Export Packs", value: "29", note: "Platform-ready bundles" },
+  { label: "Campaigns", value: "12", note: "Active across awareness to sales" },
+  { label: "Products", value: "46", note: "Synced from the Vanpella feed" },
+  { label: "Assets", value: "184", note: "Draft and approved renders" },
+  { label: "Exports", value: "29", note: "Platform-ready packs" },
 ];
 
-const flows = [
-  "Choose goal, platform, products, and locale.",
-  "Generate a structured campaign brief from the live product feed.",
-  "Create image or storyboard variants with platform presets.",
-  "Review, approve, resize, and export bundles.",
+const recentCampaigns = [
+  {
+    name: "Quiet Luxury Awareness",
+    objective: "Awareness",
+    status: "Draft",
+    href: "/campaigns",
+  },
+  {
+    name: "Architect Conversion Push",
+    objective: "Sales",
+    status: "Active",
+    href: "/campaigns",
+  },
+  {
+    name: "Spring Editorial Drop",
+    objective: "Launch",
+    status: "Review",
+    href: "/campaigns",
+  },
 ];
 
 export default function Home() {
   return (
-    <div className="px-5 py-5 sm:px-8 lg:px-10">
-      <div className="panel rounded-[32px] border p-6 sm:p-8">
-        <div className="flex flex-col gap-8">
-          <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+    <div className="mx-auto max-w-[1680px] px-5 py-6 sm:px-7 lg:px-9">
+      <div className="grid gap-6">
+        <section className="surface rounded-[34px] px-6 py-6 sm:px-8 sm:py-8">
+          <div className="flex flex-col gap-8 xl:flex-row xl:items-end xl:justify-between">
             <div className="max-w-3xl">
-              <p className="eyebrow">Vanpella Workspace</p>
-              <h1 className="display mt-3 text-5xl leading-none tracking-tight text-white sm:text-6xl">
-                Campaign Studio built for clean product storytelling.
+              <p className="eyebrow">Vanpella</p>
+              <h1 className="display mt-3 text-5xl leading-[0.95] tracking-tight text-white sm:text-6xl">
+                Campaign creation for product-led commerce.
               </h1>
-              <p className="mt-5 max-w-2xl text-base leading-7 text-[var(--color-soft)] sm:text-lg">
-                This wireframe turns the planning doc into a working route shell:
-                feed-synced products, brief generation, image and video creation,
-                approvals, templates, and brand control.
+              <p className="mt-5 max-w-2xl text-base leading-7 text-white/46">
+                Build campaigns, generate assets, and publish across every
+                platform from one place.
               </p>
             </div>
-            <div className="grid gap-3 sm:grid-cols-2">
+
+            <div className="flex flex-wrap gap-3">
               <Link
                 href="/campaigns/new"
-                className="glow-ring rounded-full bg-[var(--color-orange)] px-6 py-3 text-sm font-semibold text-white transition hover:brightness-105"
+                className="rounded-full bg-[var(--color-orange)] px-6 py-3 text-sm font-semibold text-white shadow-[0_18px_44px_rgba(254,104,22,0.24)] transition hover:brightness-105"
               >
                 New Campaign
               </Link>
               <Link
-                href="/products"
-                className="rounded-full border border-white/10 bg-white/5 px-6 py-3 text-sm font-semibold text-white transition hover:border-white/20 hover:bg-white/8"
+                href="/campaigns"
+                className="rounded-full border border-white/10 bg-white/[0.03] px-6 py-3 text-sm font-semibold text-white transition hover:border-white/18 hover:bg-white/[0.05]"
               >
-                Open Product Feed
+                Open Studio
               </Link>
             </div>
           </div>
+        </section>
 
-          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-            {metrics.map((metric) => (
-              <Panel key={metric.label} title={metric.label} tone="muted">
-                <div className="mt-4 text-4xl font-semibold text-white">
-                  {metric.value}
-                </div>
-                <p className="mt-2 text-sm text-[var(--color-soft)]">
-                  {metric.note}
-                </p>
-              </Panel>
-            ))}
-          </div>
-
-          <div className="grid gap-4 xl:grid-cols-[1.35fr_0.95fr]">
-            <Panel
-              eyebrow="Primary Journey"
-              title="The operator flow stays campaign-first."
-              description="The app should avoid asking the team to think in models, negative prompts, or media pipelines."
+        <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+          {metrics.map((metric) => (
+            <div
+              key={metric.label}
+              className="rounded-[28px] border border-white/6 bg-white/[0.016] px-6 py-6"
             >
-              <div className="mt-6 grid gap-3">
-                {flows.map((flow, index) => (
-                  <div
-                    key={flow}
-                    className="rounded-[22px] border border-white/6 bg-black/15 px-4 py-4"
-                  >
-                    <div className="text-xs font-bold tracking-[0.16em] text-[var(--color-orange)]">
-                      Step {index + 1}
-                    </div>
-                    <p className="mt-2 text-sm leading-6 text-white/90">{flow}</p>
-                  </div>
-                ))}
+              <div className="text-sm uppercase tracking-[0.18em] text-white/30">
+                {metric.label}
               </div>
-            </Panel>
+              <div className="mt-4 text-5xl font-semibold tracking-[-0.04em] text-white">
+                {metric.value}
+              </div>
+              <div className="mt-3 text-sm leading-6 text-white/38">{metric.note}</div>
+            </div>
+          ))}
+        </section>
 
-            <Panel
-              eyebrow="Platform Packs"
-              title="Preset bundles for the channels that matter."
-              description="Every campaign output should know the destination before generation starts."
-            >
-              <div className="mt-6 grid gap-3 sm:grid-cols-2">
-                {["Instagram", "Facebook", "Pinterest", "TikTok"].map((name) => (
-                  <div
-                    key={name}
-                    className="rounded-[20px] border border-white/6 bg-[var(--color-panel-muted)] p-4"
-                  >
-                    <div className="text-sm font-semibold text-white">{name}</div>
-                    <div className="mt-4 flex h-28 items-center justify-center rounded-[16px] bg-gradient-to-br from-[var(--color-green)]/55 to-black/20 text-xs font-medium uppercase tracking-[0.2em] text-white/75">
-                      preset preview
-                    </div>
-                  </div>
-                ))}
+        <div className="grid gap-6 xl:grid-cols-[minmax(0,1.15fr)_420px]">
+          <section className="rounded-[32px] border border-white/6 bg-white/[0.016] px-6 py-6">
+            <div className="flex items-center justify-between gap-3">
+              <div>
+                <div className="eyebrow">Current Work</div>
+                <h2 className="mt-3 text-2xl font-semibold text-white">Recent campaigns</h2>
               </div>
-            </Panel>
-          </div>
+              <Link
+                href="/campaigns"
+                className="text-sm font-medium text-white/52 transition hover:text-white"
+              >
+                View all
+              </Link>
+            </div>
 
-          <div className="grid gap-4 xl:grid-cols-[0.95fr_1.35fr]">
-            <Panel
-              eyebrow="Core Modules"
-              title="Route map translated into live entry points."
-              description="These route shells are implemented now so the repo already matches the information architecture."
-            >
-              <div className="mt-6 grid gap-3">
-                {primaryNavigation.map((item) => (
-                  <Link
-                    key={item.href}
-                    href={item.href}
-                    className="rounded-[20px] border border-white/6 bg-white/3 px-4 py-4 transition hover:border-white/12 hover:bg-white/5"
-                  >
-                    <div className="flex items-center justify-between gap-3">
-                      <span className="text-base font-semibold text-white">
-                        {item.label}
-                      </span>
-                      <span className="text-xs tracking-[0.16em] text-[var(--color-soft)] uppercase">
-                        {item.href}
-                      </span>
+            <div className="mt-6 grid gap-3">
+              {recentCampaigns.map((campaign) => (
+                <Link
+                  key={campaign.name}
+                  href={campaign.href}
+                  className="rounded-[24px] border border-white/6 bg-black/14 px-5 py-5 transition hover:border-white/12 hover:bg-white/[0.02]"
+                >
+                  <div className="flex flex-wrap items-center justify-between gap-3">
+                    <div>
+                      <div className="text-xl font-semibold text-white">{campaign.name}</div>
+                      <div className="mt-2 text-sm text-white/36">{campaign.objective}</div>
                     </div>
-                    <p className="mt-2 text-sm leading-6 text-[var(--color-soft)]">
-                      {item.description}
-                    </p>
-                  </Link>
-                ))}
-              </div>
-            </Panel>
+                    <div className="rounded-full border border-white/8 px-3 py-1 text-[11px] uppercase tracking-[0.18em] text-white/34">
+                      {campaign.status}
+                    </div>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </section>
 
-            <Panel
-              eyebrow="Wireframe Snapshot"
-              title="The create surface is one dominant canvas."
-              description="This is the most important product decision from the reference: fewer competing panels, more focus."
-            >
-              <div className="mt-6 grid gap-4 rounded-[28px] border border-white/6 bg-black/20 p-4 lg:grid-cols-[1.1fr_0.9fr]">
-                <div className="rounded-[22px] border border-white/6 bg-[linear-gradient(160deg,rgba(35,100,84,0.24),rgba(255,255,255,0.02))] p-4">
-                  <div className="flex items-center justify-between text-xs uppercase tracking-[0.16em] text-[var(--color-soft)]">
-                    <span>Campaign Canvas</span>
-                    <span>9:16 / 1:1 / 4:5</span>
-                  </div>
-                  <div className="mt-4 grid h-80 gap-3 sm:grid-cols-2">
-                    <div className="rounded-[18px] bg-[var(--color-panel)] p-3">
-                      <div className="h-full rounded-[14px] border border-dashed border-white/12 bg-[radial-gradient(circle_at_top,rgba(254,104,22,0.2),transparent_35%),rgba(255,255,255,0.02)]" />
-                    </div>
-                    <div className="rounded-[18px] bg-[var(--color-panel)] p-3">
-                      <div className="grid h-full gap-3">
-                        <div className="rounded-[14px] border border-dashed border-white/12 bg-white/2" />
-                        <div className="rounded-[14px] border border-dashed border-white/12 bg-white/2" />
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div className="grid gap-3">
-                  <div className="rounded-[22px] border border-white/6 bg-[var(--color-panel)] p-4">
-                    <div className="eyebrow">Brief</div>
-                    <p className="mt-3 text-sm leading-6 text-white/88">
-                      Quiet-luxury awareness campaign for The Architect
-                      collection, emphasizing structure, acetate finish, and
-                      premium direct-to-consumer value.
-                    </p>
-                  </div>
-                  <div className="rounded-[22px] border border-white/6 bg-[var(--color-panel)] p-4">
-                    <div className="eyebrow">Products in Context</div>
-                    <div className="mt-3 grid gap-2">
-                      {["The Architect Ink", "The Architect Tortoise", "The Minimalist"].map(
-                        (item) => (
-                          <div
-                            key={item}
-                            className="rounded-2xl border border-white/6 bg-white/3 px-3 py-3 text-sm text-white/88"
-                          >
-                            {item}
-                          </div>
-                        ),
-                      )}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </Panel>
-          </div>
+          <section className="rounded-[32px] border border-white/6 bg-white/[0.016] px-6 py-6">
+            <div className="eyebrow">Quick Access</div>
+            <div className="mt-5 grid gap-3">
+              <QuickLink
+                href="/products"
+                title="Products"
+                description="Browse synced catalog context."
+              />
+              <QuickLink
+                href="/assets"
+                title="Assets"
+                description="Review generated media and exports."
+              />
+              <QuickLink
+                href="/templates"
+                title="Templates"
+                description="Use platform-specific campaign presets."
+              />
+              <QuickLink
+                href="/tutorials"
+                title="Tutorials"
+                description="Open product guides and help."
+              />
+            </div>
+          </section>
         </div>
       </div>
     </div>
+  );
+}
+
+function QuickLink({
+  href,
+  title,
+  description,
+}: {
+  href: string;
+  title: string;
+  description: string;
+}) {
+  return (
+    <Link
+      href={href}
+      className="rounded-[22px] border border-white/6 bg-black/14 px-5 py-4 transition hover:border-white/12 hover:bg-white/[0.02]"
+    >
+      <div className="text-lg font-semibold text-white">{title}</div>
+      <div className="mt-2 text-sm leading-6 text-white/38">{description}</div>
+    </Link>
   );
 }

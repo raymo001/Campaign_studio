@@ -1,5 +1,3 @@
-import { Panel } from "@/components/panel";
-
 const templateGroups = [
   "Awareness / Editorial Still",
   "Sale / Conversion Static",
@@ -11,28 +9,32 @@ const templateGroups = [
 
 export default function TemplatesPage() {
   return (
-    <div className="px-5 py-5 sm:px-8 lg:px-10">
-      <Panel
-        eyebrow="Preset Library"
-        title="Templates"
-        description="Templates should be opinionated and sparse. The team should pick from high-quality defaults, not maintain dozens of near-duplicates."
-      >
-        <div className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+    <div className="mx-auto max-w-[1600px] px-5 py-6 sm:px-7 lg:px-9">
+      <div className="grid gap-6">
+        <header className="max-w-3xl">
+          <div className="eyebrow">Templates</div>
+          <h1 className="mt-3 text-4xl font-semibold tracking-[-0.04em] text-white sm:text-5xl">
+            Campaign templates.
+          </h1>
+        </header>
+
+        <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
           {templateGroups.map((group) => (
-            <div
+            <article
               key={group}
-              className="rounded-[24px] border border-white/6 bg-[var(--color-panel-muted)] p-5"
+              className="rounded-[28px] border border-white/6 bg-white/[0.016] px-5 py-5"
             >
-              <div className="eyebrow">Preset</div>
-              <h2 className="mt-3 text-xl font-semibold text-white">{group}</h2>
-              <p className="mt-3 text-sm leading-6 text-[var(--color-soft)]">
-                Platform-safe zones, output ratios, prompt structure, and copy
-                expectations all live here.
-              </p>
-            </div>
+              <div className="text-[11px] uppercase tracking-[0.18em] text-white/28">
+                Preset
+              </div>
+              <h2 className="mt-3 text-2xl font-semibold tracking-[-0.03em] text-white">
+                {group}
+              </h2>
+              <div className="mt-5 h-36 rounded-[22px] bg-[linear-gradient(180deg,rgba(22,71,61,0.28),rgba(255,255,255,0.02))]" />
+            </article>
           ))}
-        </div>
-      </Panel>
+        </section>
+      </div>
     </div>
   );
 }

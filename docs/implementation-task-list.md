@@ -12,6 +12,8 @@ Date: March 21, 2026
 - [x] Encode current Gemini and Seedream capability constraints in the provider layer.
 - [x] Add unit tests for feed normalization and provider capability matrices.
 - [x] Document the new backend foundation.
+- [x] Clean the main UI routes and remove internal commentary from visible product copy.
+- [x] Add a dedicated `/tutorials` help route and keep guidance out of the main workflow surfaces.
 
 ## Next Build Slice
 
@@ -38,6 +40,13 @@ Date: March 21, 2026
 - [ ] Add approval and export states for assets.
 - [x] Add campaign detail read model for brief + jobs + assets.
 - [x] Add review board UI backed by Convex queries.
+
+### UI Polish
+
+- [ ] Replace placeholder assets and template previews with live data.
+- [ ] Reduce card framing further on overview and index routes.
+- [ ] Carry the floating composer pattern into more creation flows.
+- [ ] Tighten spacing and hierarchy on mobile views.
 
 ### Testing
 

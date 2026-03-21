@@ -2,50 +2,65 @@ export const primaryNavigation = [
   {
     href: "/",
     label: "Overview",
-    short: "Studio home and orchestration view",
+    icon: "grid",
+    short: "Home",
     description:
-      "Landing dashboard with current studio state, campaign flow, and quick access to the main modules.",
+      "Home screen with quick access to campaigns, products, assets, and templates.",
   },
   {
     href: "/campaigns",
     label: "Campaigns",
-    short: "Goals, briefs, assets, approvals",
+    icon: "spark",
+    short: "Campaign list",
     description:
-      "Campaign list, active states, and links to campaign detail and creation flows.",
+      "Campaign list with access to campaign detail and creation.",
   },
   {
     href: "/products",
     label: "Products",
-    short: "Feed sync and retrieval context",
+    icon: "cube",
+    short: "Product catalog",
     description:
-      "Live product browser for the Vanpella feed, localized copy, and generation references.",
+      "Synced product catalog for campaign selection.",
   },
   {
     href: "/assets",
     label: "Assets",
-    short: "Generated media and exports",
+    icon: "image",
+    short: "Asset library",
     description:
-      "Asset library with variants, resize packs, approval status, and export bundles.",
+      "Generated media and exports.",
   },
   {
     href: "/templates",
     label: "Templates",
-    short: "Platform and objective presets",
+    icon: "stack",
+    short: "Templates",
     description:
-      "Reusable prompt packets, campaign structures, and platform-aware preset bundles.",
+      "Reusable campaign templates and presets.",
   },
   {
     href: "/brand",
     label: "Brand",
-    short: "Rules, colors, and guardrails",
+    icon: "droplet",
+    short: "Brand rules",
     description:
-      "Brand tokens, legal constraints, tone controls, and creative safety rules.",
+      "Brand palette and creative rules.",
   },
   {
     href: "/settings",
     label: "Settings",
-    short: "Integrations and environment state",
+    icon: "sliders",
+    short: "Settings",
     description:
-      "Connections for Convex, Vercel, Cloudflare R2, and model-provider configuration.",
+      "Connections and model configuration.",
+  },
+  {
+    href: "/tutorials",
+    label: "Tutorials",
+    icon: "book",
+    short: "Help",
+    description:
+      "Guides for campaign setup, generation, review, and export.",
   },
 ] as const;

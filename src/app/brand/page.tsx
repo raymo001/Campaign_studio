@@ -1,55 +1,69 @@
-import { Panel } from "@/components/panel";
-
 export default function BrandPage() {
   return (
-    <div className="px-5 py-5 sm:px-8 lg:px-10">
-      <div className="grid gap-4 xl:grid-cols-[0.9fr_1.1fr]">
-        <Panel
-          eyebrow="Brand System"
-          title="Brand"
-          description="This route centralizes tokens and generation guardrails so outputs stay premium and controlled."
-        >
-          <div className="mt-6 grid gap-3">
-            {[
-              "Primary green #16473d",
-              "Accent orange #fe6816",
-              "Premium dark workspace",
-              "Quiet-luxury tone",
-              "Disallowed claims and promo rules",
-            ].map((item) => (
-              <div
-                key={item}
-                className="rounded-[22px] border border-white/6 bg-black/18 px-4 py-4 text-sm text-white/86"
-              >
-                {item}
-              </div>
-            ))}
-          </div>
-        </Panel>
+    <div className="mx-auto max-w-[1600px] px-5 py-6 sm:px-7 lg:px-9">
+      <div className="grid gap-6">
+        <header className="max-w-3xl">
+          <div className="eyebrow">Brand</div>
+          <h1 className="mt-3 text-4xl font-semibold tracking-[-0.04em] text-white sm:text-5xl">
+            Brand rules and palette.
+          </h1>
+        </header>
 
-        <Panel
-          eyebrow="Brand Guardrails"
-          title="Creative policy blocks"
-          description="These should become structured records in Convex and feed directly into brief generation."
-        >
-          <div className="mt-6 grid gap-3 sm:grid-cols-2">
-            {[
-              "Logo placement",
-              "Copy density",
-              "Luxury editorial references",
-              "Offer and price disclosure",
-              "Localization tone",
-              "Lifestyle scene constraints",
-            ].map((item) => (
-              <div
-                key={item}
-                className="rounded-[22px] border border-dashed border-white/10 px-4 py-6 text-sm text-white/82"
-              >
-                {item}
-              </div>
-            ))}
-          </div>
-        </Panel>
+        <div className="grid gap-6 xl:grid-cols-[420px_minmax(0,1fr)]">
+          <section className="rounded-[30px] border border-white/6 bg-white/[0.016] px-6 py-6">
+            <div className="text-[11px] uppercase tracking-[0.22em] text-white/28">
+              Palette
+            </div>
+            <div className="mt-5 grid gap-3">
+              <ColorSwatch name="Vanpella green" value="#16473d" className="bg-[#16473d]" />
+              <ColorSwatch name="Accent orange" value="#fe6816" className="bg-[#fe6816]" />
+              <ColorSwatch name="Studio black" value="#090b0a" className="bg-[#090b0a]" />
+            </div>
+          </section>
+
+          <section className="rounded-[30px] border border-white/6 bg-white/[0.016] px-6 py-6">
+            <div className="text-[11px] uppercase tracking-[0.22em] text-white/28">
+              Guardrails
+            </div>
+            <div className="mt-5 grid gap-3 md:grid-cols-2">
+              {[
+                "Premium brand tone",
+                "Controlled copy density",
+                "Premium editorial references",
+                "Offer disclosure rules",
+                "Localization consistency",
+                "Lifestyle scene constraints",
+              ].map((item) => (
+                <div
+                  key={item}
+                  className="rounded-[22px] border border-white/6 bg-black/14 px-4 py-4 text-sm text-white/76"
+                >
+                  {item}
+                </div>
+              ))}
+            </div>
+          </section>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function ColorSwatch({
+  name,
+  value,
+  className,
+}: {
+  name: string;
+  value: string;
+  className: string;
+}) {
+  return (
+    <div className="rounded-[22px] border border-white/6 bg-black/14 p-4">
+      <div className={`h-20 rounded-[18px] ${className}`} />
+      <div className="mt-4 text-lg font-medium text-white">{name}</div>
+      <div className="mt-1 text-[11px] uppercase tracking-[0.18em] text-white/28">
+        {value}
       </div>
     </div>
   );

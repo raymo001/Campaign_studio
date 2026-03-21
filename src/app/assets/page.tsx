@@ -1,55 +1,53 @@
-import { Panel } from "@/components/panel";
-
 export default function AssetsPage() {
   return (
-    <div className="px-5 py-5 sm:px-8 lg:px-10">
-      <div className="grid gap-4 xl:grid-cols-[1.25fr_0.75fr]">
-        <Panel
-          eyebrow="Asset Library"
-          title="Assets"
-          description="The library should stay visual first: variants, approvals, export states, and reuse."
-        >
-          <div className="mt-6 grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
-            {Array.from({ length: 9 }).map((_, index) => (
-              <div
-                key={index}
-                className="rounded-[24px] border border-white/6 bg-black/18 p-3"
-              >
-                <div className="aspect-[4/5] rounded-[18px] bg-[linear-gradient(180deg,rgba(22,71,61,0.35),rgba(255,255,255,0.04))]" />
-                <div className="mt-3 flex items-center justify-between text-sm text-white/88">
-                  <span>Asset {index + 1}</span>
-                  <span className="text-xs uppercase tracking-[0.14em] text-[var(--color-soft)]">
-                    4:5
-                  </span>
-                </div>
-              </div>
-            ))}
+    <div className="mx-auto max-w-[1700px] px-5 py-6 sm:px-7 lg:px-9">
+      <div className="grid gap-6">
+        <header className="flex flex-col gap-5 xl:flex-row xl:items-end xl:justify-between">
+          <div className="max-w-3xl">
+            <div className="eyebrow">Assets</div>
+            <h1 className="mt-3 text-4xl font-semibold tracking-[-0.04em] text-white sm:text-5xl">
+              Generated media, kept visual.
+            </h1>
           </div>
-        </Panel>
-
-        <Panel
-          eyebrow="Export Pack"
-          title="What ships together"
-          description="Approved exports should carry media plus copy payloads and lineage metadata."
-        >
-          <div className="mt-6 grid gap-3">
-            {[
-              "Approved media",
-              "Captions",
-              "Headlines",
-              "CTA copy",
-              "Manifest JSON",
-              "Product links",
-            ].map((item) => (
-              <div
+          <div className="flex flex-wrap gap-2 text-[11px] uppercase tracking-[0.18em] text-white/30">
+            {["All", "Draft", "Approved", "4:5", "9:16", "Exported"].map((item, index) => (
+              <span
                 key={item}
-                className="rounded-2xl border border-dashed border-white/10 px-4 py-3 text-sm text-white/82"
+                className={`rounded-full border px-3 py-1.5 ${
+                  index === 0
+                    ? "border-white/12 bg-white/[0.04] text-white/72"
+                    : "border-white/7 text-white/32"
+                }`}
               >
                 {item}
-              </div>
+              </span>
             ))}
           </div>
-        </Panel>
+        </header>
+
+        <div className="grid auto-rows-[280px] gap-4 md:grid-cols-2 xl:grid-cols-4">
+          {Array.from({ length: 10 }).map((_, index) => (
+            <article
+              key={index}
+              className={`relative overflow-hidden rounded-[28px] bg-[#0a0c0b] ${
+                index === 0 ? "md:col-span-2 md:row-span-2" : ""
+              }`}
+            >
+              <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(22,71,61,0.28),rgba(255,255,255,0.02))]" />
+              <div className="absolute inset-x-0 bottom-0 flex items-end justify-between gap-3 p-4">
+                <div>
+                  <div className="text-sm font-medium text-white/88">Asset {index + 1}</div>
+                  <div className="mt-1 text-[11px] uppercase tracking-[0.18em] text-white/30">
+                    4:5
+                  </div>
+                </div>
+                <div className="text-[11px] uppercase tracking-[0.18em] text-white/36">
+                  Ready
+                </div>
+              </div>
+            </article>
+          ))}
+        </div>
       </div>
     </div>
   );
