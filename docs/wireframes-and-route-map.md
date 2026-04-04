@@ -12,6 +12,7 @@ flowchart TD
     D --> J["/campaigns/[campaignId]/try-on"]
     A --> E["/products"]
     A --> F["/assets"]
+    F --> K["/exports"]
     A --> G["/templates"]
     A --> H["/brand"]
     A --> I["/settings"]
@@ -66,6 +67,13 @@ flowchart TD
 - generated media library
 - resize/export states
 - approval status
+
+### `/exports`
+
+- export-pack queue
+- pack creation from approved assets
+- preset-linked delivery configuration
+- export status tracking
 
 ### `/templates`
 

@@ -5,10 +5,13 @@ import { redirect } from "next/navigation";
 import { buildCampaignBrief } from "@/lib/campaigns";
 import {
   attachPersonaReferenceImageInConvex,
+  createExportPackInConvex,
   createPersonaInConvex,
   createCampaignWithBriefInConvex,
   getCampaignDetailFromConvex,
+  seedTemplatePresetsInConvex,
   listProductsFromConvex,
+  updateExportPackStatusInConvex,
   updateAssetWorkflowStateInConvex,
 } from "@/lib/convex-server";
 import { runCampaignImageGeneration } from "@/lib/generation-workflow";
@@ -16,6 +19,7 @@ import { geminiSupportedImageSizes } from "@/lib/image-providers";
 import { promptUseCaseOptions } from "@/lib/prompt-system";
 import { readImageFilesFromFormData } from "@/lib/reference-images";
 import { resolveAssetWorkflowState } from "@/lib/asset-workflow";
+import { buildExportPackName, defaultTemplatePresets, normalizeExportPackStatus } from "@/lib/template-presets";
 import {
   buildPersonaReferenceKey,
   inferFileExtension,
@@ -183,6 +187,62 @@ export async function updateAssetWorkflowAction(formData: FormData) {
   revalidatePath("/assets");
   revalidatePath(redirectTo);
   redirect(redirectTo);
+}
+
+export async function seedTemplatePresetsAction() {
+  await seedTemplatePresetsInConvex([...defaultTemplatePresets]);
+  revalidatePath("/templates");
+  redirect("/templates");
+}
+
+export async function createExportPackAction(formData: FormData) {
+  const platform = String(formData.get("platform") || "").trim();
+  const locale = String(formData.get("locale") || "en-US").trim();
+  const objective = String(formData.get("objective") || "").trim();
+  const campaignId = String(formData.get("campaignId") || "").trim();
+  const templatePresetId = String(formData.get("templatePresetId") || "").trim();
+  const campaignName = String(formData.get("campaignName") || "").trim();
+  const notes = String(formData.get("notes") || "").trim();
+  const assetIds = formData
+    .getAll("assetIds")
+    .map((value) => String(value).trim())
+    .filter(Boolean);
+
+  if (!platform || assetIds.length === 0) {
+    throw new Error("Platform and at least one approved asset are required.");
+  }
+
+  await createExportPackInConvex({
+    name: buildExportPackName({ campaignName: campaignName || undefined, platform, locale }),
+    campaignId: campaignId || undefined,
+    templatePresetId: templatePresetId || undefined,
+    platform,
+    locale,
+    objective: objective || undefined,
+    assetIds,
+    notes: notes || undefined,
+  });
+
+  revalidatePath("/exports");
+  revalidatePath("/assets");
+  redirect("/exports");
+}
+
+export async function updateExportPackStatusAction(formData: FormData) {
+  const exportPackId = String(formData.get("exportPackId") || "").trim();
+  const status = normalizeExportPackStatus(String(formData.get("status") || "").trim());
+
+  if (!exportPackId) {
+    throw new Error("Export pack is required.");
+  }
+
+  await updateExportPackStatusInConvex({
+    exportPackId,
+    status,
+  });
+
+  revalidatePath("/exports");
+  redirect("/exports");
 }
 
 export async function createPersonaAction(formData: FormData) {

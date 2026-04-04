@@ -15,6 +15,7 @@ Status: Initial cleanup pass completed. A second pass tightened responsive behav
 - [x] `/campaigns/[campaignId]/try-on`
 - [x] `/products`
 - [x] `/assets`
+- [x] `/exports`
 - [x] `/templates`
 - [x] `/brand`
 - [x] `/settings`
@@ -38,10 +39,11 @@ Status: Initial cleanup pass completed. A second pass tightened responsive behav
 5. `/campaigns/[campaignId]/try-on`
 6. `/products`
 7. `/assets`
-8. `/templates`
-9. `/brand`
-10. `/settings`
-11. `/tutorials`
+8. `/exports`
+9. `/templates`
+10. `/brand`
+11. `/settings`
+12. `/tutorials`
 
 ## Next UI Pass
 

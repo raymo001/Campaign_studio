@@ -12,6 +12,8 @@ Date: April 4, 2026
 - `briefs`
 - `generationJobs`
 - `assets`
+- `templatePresets`
+- `exportPacks`
 - `personas`
 
 Defined in [convex/schema.ts](/Users/biatyraymond/Documents/Campaign_Studio/convex/schema.ts).
@@ -49,6 +51,8 @@ These provide server-side helpers for:
 - querying campaigns
 - querying overview metrics
 - querying the asset library
+- querying template presets
+- querying export packs
 - querying personas
 - creating campaigns with their initial brief
 - creating persona records
@@ -84,6 +88,8 @@ Behavior:
 - generation creates a job record, runs the chosen provider, uploads the image to R2, then stores the asset record in Convex
 - failed generations are written back to `generationJobs.errorMessage`
 - assets now support `reviewStatus` and `exportStatus` workflow state in addition to the underlying generation `status`
+- template presets are now stored as real Convex records and seeded into the workspace
+- export packs are now stored as first-class records with platform, locale, selected assets, and export status
 
 ### API route
 
@@ -100,6 +106,7 @@ Pages now read real Convex data:
 
 - [src/app/page.tsx](/Users/biatyraymond/Documents/Campaign_Studio/src/app/page.tsx)
 - [src/app/assets/page.tsx](/Users/biatyraymond/Documents/Campaign_Studio/src/app/assets/page.tsx)
+- [src/app/exports/page.tsx](/Users/biatyraymond/Documents/Campaign_Studio/src/app/exports/page.tsx)
 - [src/app/products/page.tsx](/Users/biatyraymond/Documents/Campaign_Studio/src/app/products/page.tsx)
 - [src/app/campaigns/page.tsx](/Users/biatyraymond/Documents/Campaign_Studio/src/app/campaigns/page.tsx)
 - [src/app/campaigns/new/page.tsx](/Users/biatyraymond/Documents/Campaign_Studio/src/app/campaigns/new/page.tsx)
@@ -126,6 +133,7 @@ Test coverage currently focuses on:
 - brief generation and prompt construction
 - R2 key and public URL construction
 - asset review/export workflow transitions
+- template preset coverage and export-pack helper behavior
 
 Files:
 
@@ -135,6 +143,7 @@ Files:
 - [tests/prompt-system.test.ts](/Users/biatyraymond/Documents/Campaign_Studio/tests/prompt-system.test.ts)
 - [tests/reference-images.test.ts](/Users/biatyraymond/Documents/Campaign_Studio/tests/reference-images.test.ts)
 - [tests/asset-workflow.test.ts](/Users/biatyraymond/Documents/Campaign_Studio/tests/asset-workflow.test.ts)
+- [tests/template-presets.test.ts](/Users/biatyraymond/Documents/Campaign_Studio/tests/template-presets.test.ts)
 
 Run with:
 

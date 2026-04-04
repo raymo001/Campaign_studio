@@ -10,10 +10,12 @@
 
 import type * as campaigns from "../campaigns.js";
 import type * as crons from "../crons.js";
+import type * as exports from "../exports.js";
 import type * as feed from "../feed.js";
 import type * as feedStore from "../feedStore.js";
 import type * as personas from "../personas.js";
 import type * as products from "../products.js";
+import type * as templates from "../templates.js";
 
 import type {
   ApiFromModules,
@@ -24,10 +26,12 @@ import type {
 declare const fullApi: ApiFromModules<{
   campaigns: typeof campaigns;
   crons: typeof crons;
+  exports: typeof exports;
   feed: typeof feed;
   feedStore: typeof feedStore;
   personas: typeof personas;
   products: typeof products;
+  templates: typeof templates;
 }>;
 
 /**

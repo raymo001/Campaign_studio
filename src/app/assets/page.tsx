@@ -24,16 +24,24 @@ export default async function AssetsPage() {
               Review and export.
             </h1>
           </div>
-          <div className="flex flex-wrap gap-2 text-[11px] uppercase tracking-[0.18em] text-white/30">
-            <span className="rounded-full border border-white/8 px-3 py-1.5">
-              {assets.length} recent
-            </span>
-            <span className="rounded-full border border-white/8 px-3 py-1.5">
-              {assets.filter((asset) => normalizeReviewStatus(asset.reviewStatus) === "approved").length} approved
-            </span>
-            <span className="rounded-full border border-white/8 px-3 py-1.5">
-              {assets.filter((asset) => normalizeExportStatus(asset.exportStatus) === "exported").length} exported
-            </span>
+          <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:justify-end">
+            <Link
+              href="/exports"
+              className="rounded-full border border-white/8 bg-white/[0.03] px-5 py-2.5 text-center text-sm font-medium text-white/84 transition hover:border-white/16 hover:bg-white/[0.05]"
+            >
+              Open Export Packs
+            </Link>
+            <div className="flex flex-wrap gap-2 text-[11px] uppercase tracking-[0.18em] text-white/30">
+              <span className="rounded-full border border-white/8 px-3 py-1.5">
+                {assets.length} recent
+              </span>
+              <span className="rounded-full border border-white/8 px-3 py-1.5">
+                {assets.filter((asset) => normalizeReviewStatus(asset.reviewStatus) === "approved").length} approved
+              </span>
+              <span className="rounded-full border border-white/8 px-3 py-1.5">
+                {assets.filter((asset) => normalizeExportStatus(asset.exportStatus) === "exported").length} exported
+              </span>
+            </div>
           </div>
         </header>
 

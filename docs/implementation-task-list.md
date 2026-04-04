@@ -30,7 +30,7 @@ Date: April 4, 2026
 
 - [x] Wire `/campaigns/new` to `campaigns.create`.
 - [x] Add structured brief schema and persistence.
-- [ ] Create platform preset records and selection logic.
+- [x] Create platform preset records and selection logic.
 - [x] Add prompt use-case selection to generation controls.
 - [ ] Add prompt use-case selection to campaign creation.
 - [x] Add a dedicated try-on route with product, persona, and reference-image controls.
@@ -49,12 +49,13 @@ Date: April 4, 2026
 - [x] Add review board UI backed by Convex queries.
 - [x] Expose prompt metadata, persona linkage, and uploaded reference cues in campaign job history.
 - [x] Add a live asset library with review/export controls.
+- [x] Add dedicated export-pack records and workflow.
 
 ### UI Polish
 
 - [x] Replace placeholder overview metrics with live Convex-backed metrics.
 - [x] Replace placeholder asset library cards with live asset data.
-- [ ] Replace placeholder template previews with live data.
+- [x] Replace placeholder template previews with live data.
 - [ ] Reduce card framing further on overview and index routes.
 - [ ] Carry the floating composer pattern into more creation flows.
 - [x] Tighten spacing and hierarchy on mobile views.

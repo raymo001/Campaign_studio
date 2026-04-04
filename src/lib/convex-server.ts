@@ -37,6 +37,39 @@ export async function listAssetsFromConvex(limit = 60) {
   return client.query(api.campaigns.listAssets, { limit });
 }
 
+export async function listTemplatePresetsFromConvex(limit = 24) {
+  const client = getConvexServerClient();
+  return client.query(api.templates.list, { limit });
+}
+
+export async function seedTemplatePresetsInConvex(presets: Array<{
+  slug: string;
+  name: string;
+  objective: string;
+  primaryPlatform: string;
+  platformMix: string[];
+  aspectRatio: string;
+  imageSize: string;
+  useCase: string;
+  status: string;
+  visualDirection: string;
+  copyDirection: string;
+  notes: string[];
+}>) {
+  const client = getConvexServerClient();
+  return client.mutation(api.templates.seedDefaults, { presets });
+}
+
+export async function listExportPacksFromConvex(limit = 30) {
+  const client = getConvexServerClient();
+  return client.query(api.exports.listPacks, { limit });
+}
+
+export async function getExportOverviewFromConvex() {
+  const client = getConvexServerClient();
+  return client.query(api.exports.getOverview, {});
+}
+
 export async function listPersonasFromConvex(limit = 24) {
   const client = getConvexServerClient();
   return client.query(api.personas.list, { limit });
@@ -177,5 +210,35 @@ export async function updateAssetWorkflowStateInConvex(args: {
     assetId: args.assetId as never,
     reviewStatus: args.reviewStatus,
     exportStatus: args.exportStatus,
+  });
+}
+
+export async function createExportPackInConvex(args: {
+  name: string;
+  campaignId?: string;
+  templatePresetId?: string;
+  platform: string;
+  locale: string;
+  objective?: string;
+  assetIds: string[];
+  notes?: string;
+}) {
+  const client = getConvexServerClient();
+  return client.mutation(api.exports.createPack, {
+    ...args,
+    campaignId: args.campaignId as never,
+    templatePresetId: args.templatePresetId as never,
+    assetIds: args.assetIds as never,
+  });
+}
+
+export async function updateExportPackStatusInConvex(args: {
+  exportPackId: string;
+  status: string;
+}) {
+  const client = getConvexServerClient();
+  return client.mutation(api.exports.updatePackStatus, {
+    exportPackId: args.exportPackId as never,
+    status: args.status,
   });
 }

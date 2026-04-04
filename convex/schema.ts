@@ -140,6 +140,44 @@ export default defineSchema({
     .index("by_review_status", ["reviewStatus"])
     .index("by_export_status", ["exportStatus"]),
 
+  templatePresets: defineTable({
+    slug: v.string(),
+    name: v.string(),
+    objective: v.string(),
+    primaryPlatform: v.string(),
+    platformMix: v.array(v.string()),
+    aspectRatio: v.string(),
+    imageSize: v.string(),
+    useCase: v.string(),
+    status: v.string(),
+    visualDirection: v.string(),
+    copyDirection: v.string(),
+    notes: v.array(v.string()),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  })
+    .index("by_slug", ["slug"])
+    .index("by_platform", ["primaryPlatform"])
+    .index("by_objective", ["objective"]),
+
+  exportPacks: defineTable({
+    name: v.string(),
+    campaignId: v.optional(v.id("campaigns")),
+    templatePresetId: v.optional(v.id("templatePresets")),
+    platform: v.string(),
+    locale: v.string(),
+    objective: v.optional(v.string()),
+    status: v.string(),
+    assetIds: v.array(v.id("assets")),
+    notes: v.optional(v.string()),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+    exportedAt: v.optional(v.number()),
+  })
+    .index("by_campaign", ["campaignId"])
+    .index("by_status", ["status"])
+    .index("by_updated_at", ["updatedAt"]),
+
   personas: defineTable({
     name: v.string(),
     slug: v.string(),

@@ -32,6 +32,14 @@ export const primaryNavigation = [
       "Generated media and exports.",
   },
   {
+    href: "/exports",
+    label: "Exports",
+    icon: "archive",
+    short: "Export packs",
+    description:
+      "Pack approved assets for platform delivery.",
+  },
+  {
     href: "/templates",
     label: "Templates",
     icon: "stack",

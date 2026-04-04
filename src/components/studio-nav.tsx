@@ -6,7 +6,7 @@ import { primaryNavigation } from "@/lib/navigation";
 
 export function StudioNav() {
   const pathname = usePathname();
-  const mobileNavigation = primaryNavigation.slice(0, 5);
+  const mobileNavigation = primaryNavigation.slice(0, 6);
 
   return (
     <>
@@ -75,7 +75,7 @@ export function StudioNav() {
       </aside>
 
       <div className="fixed inset-x-0 bottom-0 z-40 border-t border-white/6 bg-[rgba(10,13,12,0.94)] px-2 py-2 backdrop-blur-xl lg:hidden">
-        <nav className="grid grid-cols-5 gap-1">
+        <nav className="grid grid-cols-6 gap-1">
           {mobileNavigation.map((item) => {
             const active =
               pathname === item.href ||
@@ -92,7 +92,7 @@ export function StudioNav() {
                 }`}
               >
                 <NavIcon type={item.icon} />
-                <span className="mt-1 text-[10px] text-white/58">{item.label}</span>
+                <span className="mt-1 text-[9px] text-white/58">{item.label}</span>
               </Link>
             );
           })}
@@ -136,6 +136,14 @@ function NavIcon({ type }: { type: (typeof primaryNavigation)[number]["icon"] })
           <rect x="3" y="4" width="18" height="16" rx="3" />
           <circle cx="8.5" cy="9" r="1.5" />
           <path d="m21 16-5.5-5.5L7 19" />
+        </svg>
+      );
+    case "archive":
+      return (
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className={className}>
+          <rect x="3" y="5" width="18" height="4" rx="1.5" />
+          <path d="M5 9h14v9a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2Z" />
+          <path d="M10 13h4" />
         </svg>
       );
     case "stack":
