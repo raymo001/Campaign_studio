@@ -55,14 +55,54 @@ export async function seedTemplatePresetsInConvex(presets: Array<{
   visualDirection: string;
   copyDirection: string;
   notes: string[];
+  deliveryBundleKey?: string;
+  fileNameTemplate?: string;
 }>) {
   const client = getConvexServerClient();
   return client.mutation(api.templates.seedDefaults, { presets });
 }
 
+export async function upsertTemplatePresetInConvex(args: {
+  presetId?: string;
+  slug: string;
+  name: string;
+  objective: string;
+  primaryPlatform: string;
+  platformMix: string[];
+  aspectRatio: string;
+  imageSize: string;
+  useCase: string;
+  status: string;
+  visualDirection: string;
+  copyDirection: string;
+  notes: string[];
+  deliveryBundleKey?: string;
+  fileNameTemplate?: string;
+}) {
+  const client = getConvexServerClient();
+  return client.mutation(api.templates.upsert, {
+    ...args,
+    presetId: args.presetId as never,
+  });
+}
+
+export async function removeTemplatePresetFromConvex(presetId: string) {
+  const client = getConvexServerClient();
+  return client.mutation(api.templates.remove, {
+    presetId: presetId as never,
+  });
+}
+
 export async function listExportPacksFromConvex(limit = 30) {
   const client = getConvexServerClient();
   return client.query(api.exports.listPacks, { limit });
+}
+
+export async function getExportPackFromConvex(exportPackId: string) {
+  const client = getConvexServerClient();
+  return client.query(api.exports.getPack, {
+    exportPackId: exportPackId as never,
+  });
 }
 
 export async function getExportOverviewFromConvex() {
@@ -222,6 +262,8 @@ export async function createExportPackInConvex(args: {
   objective?: string;
   assetIds: string[];
   notes?: string;
+  deliveryBundleKey?: string;
+  fileNameTemplate?: string;
 }) {
   const client = getConvexServerClient();
   return client.mutation(api.exports.createPack, {
@@ -229,6 +271,23 @@ export async function createExportPackInConvex(args: {
     campaignId: args.campaignId as never,
     templatePresetId: args.templatePresetId as never,
     assetIds: args.assetIds as never,
+  });
+}
+
+export async function updateExportPackDeliveryInConvex(args: {
+  exportPackId: string;
+  templatePresetId?: string;
+  notes?: string;
+  deliveryBundleKey?: string;
+  fileNameTemplate?: string;
+}) {
+  const client = getConvexServerClient();
+  return client.mutation(api.exports.updatePackDelivery, {
+    exportPackId: args.exportPackId as never,
+    templatePresetId: args.templatePresetId as never,
+    notes: args.notes,
+    deliveryBundleKey: args.deliveryBundleKey,
+    fileNameTemplate: args.fileNameTemplate,
   });
 }
 

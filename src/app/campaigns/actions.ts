@@ -9,8 +9,11 @@ import {
   createPersonaInConvex,
   createCampaignWithBriefInConvex,
   getCampaignDetailFromConvex,
+  removeTemplatePresetFromConvex,
   seedTemplatePresetsInConvex,
   listProductsFromConvex,
+  upsertTemplatePresetInConvex,
+  updateExportPackDeliveryInConvex,
   updateExportPackStatusInConvex,
   updateAssetWorkflowStateInConvex,
 } from "@/lib/convex-server";
@@ -19,7 +22,14 @@ import { geminiSupportedImageSizes } from "@/lib/image-providers";
 import { promptUseCaseOptions } from "@/lib/prompt-system";
 import { readImageFilesFromFormData } from "@/lib/reference-images";
 import { resolveAssetWorkflowState } from "@/lib/asset-workflow";
-import { buildExportPackName, defaultTemplatePresets, normalizeExportPackStatus } from "@/lib/template-presets";
+import {
+  buildExportPackName,
+  defaultTemplatePresets,
+  inferDeliveryBundleKey,
+  normalizeExportPackStatus,
+  normalizeFileNameTemplate,
+  normalizeTemplatePresetStatus,
+} from "@/lib/template-presets";
 import {
   buildPersonaReferenceKey,
   inferFileExtension,
@@ -190,8 +200,84 @@ export async function updateAssetWorkflowAction(formData: FormData) {
 }
 
 export async function seedTemplatePresetsAction() {
-  await seedTemplatePresetsInConvex([...defaultTemplatePresets]);
+  await seedTemplatePresetsInConvex(
+    defaultTemplatePresets.map((preset) => ({
+      ...preset,
+      platformMix: [...preset.platformMix],
+      notes: [...preset.notes],
+    })),
+  );
   revalidatePath("/templates");
+  redirect("/templates");
+}
+
+export async function upsertTemplatePresetAction(formData: FormData) {
+  const presetId = String(formData.get("presetId") || "").trim();
+  const name = String(formData.get("name") || "").trim();
+  const slugInput = String(formData.get("slug") || "").trim();
+  const objective = String(formData.get("objective") || "").trim();
+  const primaryPlatform = String(formData.get("primaryPlatform") || "").trim();
+  const aspectRatio = String(formData.get("aspectRatio") || "").trim();
+  const imageSize = String(formData.get("imageSize") || "").trim();
+  const useCase = String(formData.get("useCase") || "").trim();
+  const status = normalizeTemplatePresetStatus(String(formData.get("status") || "").trim());
+  const visualDirection = String(formData.get("visualDirection") || "").trim();
+  const copyDirection = String(formData.get("copyDirection") || "").trim();
+  const deliveryBundleKey = String(formData.get("deliveryBundleKey") || "").trim();
+  const fileNameTemplate = normalizeFileNameTemplate(
+    String(formData.get("fileNameTemplate") || "").trim(),
+  );
+  const platformMix = formData
+    .getAll("platformMix")
+    .map((value) => String(value).trim())
+    .filter(Boolean);
+  const notes = String(formData.get("notes") || "")
+    .split("\n")
+    .map((value) => value.trim())
+    .filter(Boolean);
+
+  if (!name || !objective || !primaryPlatform || !aspectRatio || !imageSize || !useCase) {
+    throw new Error("Preset name, objective, platform, format, and use case are required.");
+  }
+
+  const slug = slugify(slugInput || name);
+  if (!slug) {
+    throw new Error("Preset slug is required.");
+  }
+
+  await upsertTemplatePresetInConvex({
+    presetId: presetId || undefined,
+    slug,
+    name,
+    objective,
+    primaryPlatform,
+    platformMix: platformMix.length ? platformMix : [primaryPlatform],
+    aspectRatio,
+    imageSize,
+    useCase,
+    status,
+    visualDirection,
+    copyDirection,
+    notes,
+    deliveryBundleKey: deliveryBundleKey || inferDeliveryBundleKey(primaryPlatform),
+    fileNameTemplate,
+  });
+
+  revalidatePath("/templates");
+  revalidatePath("/exports");
+  redirect("/templates");
+}
+
+export async function removeTemplatePresetAction(formData: FormData) {
+  const presetId = String(formData.get("presetId") || "").trim();
+  if (!presetId) {
+    throw new Error("Template preset is required.");
+  }
+
+  await removeTemplatePresetFromConvex(presetId);
+
+  revalidatePath("/templates");
+  revalidatePath("/exports");
   redirect("/templates");
 }
 
@@ -203,6 +289,10 @@ export async function createExportPackAction(formData: FormData) {
   const templatePresetId = String(formData.get("templatePresetId") || "").trim();
   const campaignName = String(formData.get("campaignName") || "").trim();
   const notes = String(formData.get("notes") || "").trim();
+  const deliveryBundleKey = String(formData.get("deliveryBundleKey") || "").trim();
+  const fileNameTemplate = normalizeFileNameTemplate(
+    String(formData.get("fileNameTemplate") || "").trim(),
+  );
   const assetIds = formData
     .getAll("assetIds")
     .map((value) => String(value).trim())
@@ -221,10 +311,37 @@ export async function createExportPackAction(formData: FormData) {
     objective: objective || undefined,
     assetIds,
     notes: notes || undefined,
+    deliveryBundleKey: deliveryBundleKey || inferDeliveryBundleKey(platform),
+    fileNameTemplate,
   });
 
   revalidatePath("/exports");
   revalidatePath("/assets");
+  redirect("/exports");
+}
+
+export async function updateExportPackDeliveryAction(formData: FormData) {
+  const exportPackId = String(formData.get("exportPackId") || "").trim();
+  const templatePresetId = String(formData.get("templatePresetId") || "").trim();
+  const notes = String(formData.get("notes") || "").trim();
+  const deliveryBundleKey = String(formData.get("deliveryBundleKey") || "").trim();
+  const fileNameTemplate = normalizeFileNameTemplate(
+    String(formData.get("fileNameTemplate") || "").trim(),
+  );
+
+  if (!exportPackId) {
+    throw new Error("Export pack is required.");
+  }
+
+  await updateExportPackDeliveryInConvex({
+    exportPackId,
+    templatePresetId: templatePresetId || undefined,
+    notes: notes || undefined,
+    deliveryBundleKey: deliveryBundleKey || undefined,
+    fileNameTemplate,
+  });
+
+  revalidatePath("/exports");
   redirect("/exports");
 }
 
@@ -298,4 +415,12 @@ export async function createPersonaAction(formData: FormData) {
 
   revalidatePath("/personas");
   redirect("/personas");
+}
+
+function slugify(value: string) {
+  return value
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
 }

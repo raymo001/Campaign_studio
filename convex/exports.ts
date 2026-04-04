@@ -31,6 +31,32 @@ export const listPacks = query({
   },
 });
 
+export const getPack = query({
+  args: {
+    exportPackId: v.id("exportPacks"),
+  },
+  handler: async (ctx, args) => {
+    const pack = await ctx.db.get(args.exportPackId);
+    if (!pack) {
+      return null;
+    }
+
+    const campaign = pack.campaignId ? await ctx.db.get(pack.campaignId) : null;
+    const templatePreset = pack.templatePresetId
+      ? await ctx.db.get(pack.templatePresetId)
+      : null;
+    const assets = await Promise.all(pack.assetIds.map((id) => ctx.db.get(id)));
+
+    return {
+      ...pack,
+      campaignName: campaign?.name,
+      templatePresetName: templatePreset?.name,
+      assetCount: assets.filter(Boolean).length,
+      assets: assets.filter((asset) => asset !== null),
+    };
+  },
+});
+
 export const getOverview = query({
   args: {},
   handler: async (ctx) => {
@@ -73,6 +99,8 @@ export const createPack = mutation({
     objective: v.optional(v.string()),
     assetIds: v.array(v.id("assets")),
     notes: v.optional(v.string()),
+    deliveryBundleKey: v.optional(v.string()),
+    fileNameTemplate: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
     const now = Date.now();
@@ -87,12 +115,49 @@ export const createPack = mutation({
       }
     }
 
-    return ctx.db.insert("exportPacks", {
+    const packId = await ctx.db.insert("exportPacks", {
       ...args,
       status: "draft",
       createdAt: now,
       updatedAt: now,
     });
+
+    await Promise.all(
+      args.assetIds.map((assetId) =>
+        ctx.db.patch(assetId, {
+          exportStatus: "queued",
+          updatedAt: now,
+        }),
+      ),
+    );
+
+    return packId;
+  },
+});
+
+export const updatePackDelivery = mutation({
+  args: {
+    exportPackId: v.id("exportPacks"),
+    templatePresetId: v.optional(v.id("templatePresets")),
+    notes: v.optional(v.string()),
+    deliveryBundleKey: v.optional(v.string()),
+    fileNameTemplate: v.optional(v.string()),
+  },
+  handler: async (ctx, args) => {
+    const pack = await ctx.db.get(args.exportPackId);
+    if (!pack) {
+      throw new Error("Export pack not found.");
+    }
+
+    await ctx.db.patch(args.exportPackId, {
+      templatePresetId: args.templatePresetId,
+      notes: args.notes,
+      deliveryBundleKey: args.deliveryBundleKey,
+      fileNameTemplate: args.fileNameTemplate,
+      updatedAt: Date.now(),
+    });
+
+    return { exportPackId: args.exportPackId };
   },
 });
 
@@ -107,16 +172,34 @@ export const updatePackStatus = mutation({
       throw new Error("Export pack not found.");
     }
 
+    const now = Date.now();
     const patch: Record<string, unknown> = {
       status: args.status,
-      updatedAt: Date.now(),
+      updatedAt: now,
     };
 
     if (args.status === "exported") {
-      patch.exportedAt = Date.now();
+      patch.exportedAt = now;
     }
 
     await ctx.db.patch(args.exportPackId, patch);
+
+    const exportStatus = args.status === "exported" ? "exported" : args.status === "ready" ? "queued" : "not-exported";
+    await Promise.all(
+      pack.assetIds.map((assetId) => {
+        const assetPatch: Record<string, unknown> = {
+          exportStatus,
+          updatedAt: now,
+        };
+
+        if (args.status === "exported") {
+          assetPatch.exportedAt = now;
+        }
+
+        return ctx.db.patch(assetId, assetPatch);
+      }),
+    );
+
     return {
       exportPackId: args.exportPackId,
       status: args.status,

@@ -74,12 +74,16 @@ flowchart TD
 - pack creation from approved assets
 - preset-linked delivery configuration
 - export status tracking
+- bundle/file-name preview
+- downloadable package generation
 
 ### `/templates`
 
 - platform presets
 - campaign objective presets
 - reusable prompt packets
+- editable delivery bundle defaults
+- editable filename template rules
 
 ### `/brand`
 

@@ -89,7 +89,11 @@ Behavior:
 - failed generations are written back to `generationJobs.errorMessage`
 - assets now support `reviewStatus` and `exportStatus` workflow state in addition to the underlying generation `status`
 - template presets are now stored as real Convex records and seeded into the workspace
-- export packs are now stored as first-class records with platform, locale, selected assets, and export status
+- template presets can now be edited in-app, including delivery bundle defaults and filename templates
+- export packs are now stored as first-class records with platform, locale, selected assets, delivery bundle settings, and export status
+- export pack creation now moves approved assets into queued export state
+- export pack status updates propagate back to linked asset export state
+- export packs can now produce downloadable zip packages with a delivery manifest and master asset files
 
 ### API route
 
@@ -107,6 +111,7 @@ Pages now read real Convex data:
 - [src/app/page.tsx](/Users/biatyraymond/Documents/Campaign_Studio/src/app/page.tsx)
 - [src/app/assets/page.tsx](/Users/biatyraymond/Documents/Campaign_Studio/src/app/assets/page.tsx)
 - [src/app/exports/page.tsx](/Users/biatyraymond/Documents/Campaign_Studio/src/app/exports/page.tsx)
+- [src/app/exports/[exportPackId]/download/route.ts](/Users/biatyraymond/Documents/Campaign_Studio/src/app/exports/[exportPackId]/download/route.ts)
 - [src/app/products/page.tsx](/Users/biatyraymond/Documents/Campaign_Studio/src/app/products/page.tsx)
 - [src/app/campaigns/page.tsx](/Users/biatyraymond/Documents/Campaign_Studio/src/app/campaigns/page.tsx)
 - [src/app/campaigns/new/page.tsx](/Users/biatyraymond/Documents/Campaign_Studio/src/app/campaigns/new/page.tsx)
@@ -134,6 +139,7 @@ Test coverage currently focuses on:
 - R2 key and public URL construction
 - asset review/export workflow transitions
 - template preset coverage and export-pack helper behavior
+- export bundle filename templating and manifest generation
 
 Files:
 

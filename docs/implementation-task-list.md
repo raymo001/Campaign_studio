@@ -50,6 +50,9 @@ Date: April 4, 2026
 - [x] Expose prompt metadata, persona linkage, and uploaded reference cues in campaign job history.
 - [x] Add a live asset library with review/export controls.
 - [x] Add dedicated export-pack records and workflow.
+- [x] Make template presets editable in-app.
+- [x] Add export-pack delivery bundle and filename-template editing.
+- [x] Add downloadable export package generation with manifest + master assets.
 
 ### UI Polish
 
@@ -67,3 +70,4 @@ Date: April 4, 2026
 - [ ] Add smoke-test scripts for Gemini, OpenAI, and Seedream image generation.
 - [x] Add workflow-level tests for brief generation and R2 asset URL construction.
 - [x] Add workflow-state tests for asset approval and export transitions.
+- [x] Add tests for delivery bundles, filename templating, and export manifests.

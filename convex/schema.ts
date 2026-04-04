@@ -153,6 +153,8 @@ export default defineSchema({
     visualDirection: v.string(),
     copyDirection: v.string(),
     notes: v.array(v.string()),
+    deliveryBundleKey: v.optional(v.string()),
+    fileNameTemplate: v.optional(v.string()),
     createdAt: v.number(),
     updatedAt: v.number(),
   })
@@ -170,11 +172,14 @@ export default defineSchema({
     status: v.string(),
     assetIds: v.array(v.id("assets")),
     notes: v.optional(v.string()),
+    deliveryBundleKey: v.optional(v.string()),
+    fileNameTemplate: v.optional(v.string()),
     createdAt: v.number(),
     updatedAt: v.number(),
     exportedAt: v.optional(v.number()),
   })
     .index("by_campaign", ["campaignId"])
+    .index("by_template_preset", ["templatePresetId"])
     .index("by_status", ["status"])
     .index("by_updated_at", ["updatedAt"]),
 
