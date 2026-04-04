@@ -1,7 +1,14 @@
 import Image from "next/image";
+import Link from "next/link";
 import { notFound } from "next/navigation";
+import { updateAssetWorkflowAction } from "@/app/campaigns/actions";
 import { GenerationComposer } from "@/components/generation-composer";
 import { getCampaignDetailFromConvex } from "@/lib/convex-server";
+import {
+  assetReviewStatusOptions,
+  normalizeExportStatus,
+  normalizeReviewStatus,
+} from "@/lib/asset-workflow";
 import {
   geminiSupportedAspectRatios,
   geminiSupportedImageSizes,
@@ -31,7 +38,7 @@ export default async function CampaignDetailPage({
   const personaById = new Map(personas.map((persona) => [persona._id, persona.name]));
 
   return (
-    <div className="mx-auto max-w-[1760px] px-5 pb-32 pt-6 sm:px-7 lg:px-9">
+    <div className="mx-auto max-w-[1760px] px-4 pb-44 pt-5 sm:px-7 sm:pt-6 lg:px-9 lg:pb-32">
       <div className="grid gap-6">
         <header className="flex flex-col gap-5">
           <div className="flex flex-wrap items-start justify-between gap-4">
@@ -40,7 +47,7 @@ export default async function CampaignDetailPage({
                 Campaign
               </div>
               <div className="flex flex-wrap items-center gap-3">
-                <h1 className="text-4xl font-semibold tracking-[-0.045em] text-white sm:text-5xl">
+                <h1 className="text-3xl font-semibold tracking-[-0.045em] text-white sm:text-5xl">
                   {detail.campaign.name}
                 </h1>
                 <span className="rounded-full border border-[rgba(58,147,122,0.5)] bg-[rgba(31,102,86,0.16)] px-3 py-1 text-[11px] uppercase tracking-[0.18em] text-[#8ecfbd]">
@@ -58,6 +65,12 @@ export default async function CampaignDetailPage({
               <Chip>{detail.campaign.primaryPlatform}</Chip>
               <Chip>{detail.campaign.locale}</Chip>
               <Chip>{assets.length} assets</Chip>
+              <Link
+                href={`/campaigns/${detail.campaign._id}/try-on`}
+                className="rounded-full border border-[rgba(254,104,22,0.45)] bg-[rgba(254,104,22,0.08)] px-3 py-1.5 text-[11px] uppercase tracking-[0.18em] text-[var(--color-orange)]"
+              >
+                Try-on
+              </Link>
             </div>
           </div>
 
@@ -80,7 +93,7 @@ export default async function CampaignDetailPage({
                 Generate the first asset to populate the board.
               </div>
             ) : (
-              <div className="grid auto-rows-[240px] gap-4 lg:grid-cols-2 2xl:grid-cols-3">
+              <div className="grid auto-rows-[220px] gap-4 sm:auto-rows-[240px] lg:grid-cols-2 2xl:grid-cols-3">
                 <AssetTile asset={heroAsset} hero />
                 {secondaryAssets.map((asset) => (
                   <AssetTile key={asset._id} asset={asset} />
@@ -207,8 +220,33 @@ export default async function CampaignDetailPage({
                         {asset.aspectRatio || "image"}
                       </div>
                     </div>
-                    <div className="text-[11px] uppercase tracking-[0.18em] text-white/34">
-                      {asset.status}
+                    <div className="flex flex-col items-end gap-2">
+                      <div className="text-[11px] uppercase tracking-[0.18em] text-white/34">
+                        {normalizeReviewStatus(asset.reviewStatus)}
+                      </div>
+                      <form action={updateAssetWorkflowAction}>
+                        <input type="hidden" name="assetId" value={asset._id} />
+                        <input type="hidden" name="redirectTo" value={`/campaigns/${detail.campaign._id}`} />
+                        <div className="flex items-center gap-2">
+                          <select
+                            name="reviewStatus"
+                            defaultValue={normalizeReviewStatus(asset.reviewStatus)}
+                            className="h-8 rounded-full border border-white/8 bg-black/18 px-3 text-[11px] uppercase tracking-[0.14em] text-white/70 outline-none"
+                          >
+                            {assetReviewStatusOptions.map((option) => (
+                              <option key={option} value={option} className="bg-[var(--color-panel)]">
+                                {option}
+                              </option>
+                            ))}
+                          </select>
+                          <button
+                            type="submit"
+                            className="rounded-full border border-white/8 px-2.5 py-1 text-[10px] uppercase tracking-[0.16em] text-white/52"
+                          >
+                            Save
+                          </button>
+                        </div>
+                      </form>
                     </div>
                   </div>
                 ))}
@@ -250,6 +288,8 @@ function AssetTile({
         provider: string;
         status: string;
         aspectRatio?: string;
+        reviewStatus?: string;
+        exportStatus?: string;
       }
     | undefined;
   hero?: boolean;
@@ -284,7 +324,9 @@ function AssetTile({
           <div className="text-[11px] uppercase tracking-[0.2em] text-white/38">
             {asset.provider}
           </div>
-          <div className="mt-2 text-xs text-white/68">{asset.aspectRatio || "image"}</div>
+          <div className="mt-2 text-xs text-white/68">
+            {asset.aspectRatio || "image"} · {normalizeReviewStatus(asset.reviewStatus)} · {normalizeExportStatus(asset.exportStatus)}
+          </div>
         </div>
         <div className="text-[11px] uppercase tracking-[0.18em] text-white/58">
           {asset.status}

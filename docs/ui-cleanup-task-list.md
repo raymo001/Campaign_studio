@@ -1,10 +1,10 @@
 # UI Cleanup Task List
 
-Date: March 21, 2026
+Date: April 4, 2026
 
 Goal: Bring every primary screen closer to the visual cleanliness of the reference by removing internal commentary, reducing panel density, simplifying hierarchy, and keeping the interface image-first and action-first.
 
-Status: Initial cleanup pass completed. Route structure, copy, and hierarchy were simplified across all primary screens.
+Status: Initial cleanup pass completed. A second pass tightened responsive behavior, added mobile navigation, and introduced a dedicated try-on workspace.
 
 ## Screen Inventory
 
@@ -12,6 +12,7 @@ Status: Initial cleanup pass completed. Route structure, copy, and hierarchy wer
 - [x] `/campaigns`
 - [x] `/campaigns/new`
 - [x] `/campaigns/[campaignId]`
+- [x] `/campaigns/[campaignId]/try-on`
 - [x] `/products`
 - [x] `/assets`
 - [x] `/templates`
@@ -34,12 +35,13 @@ Status: Initial cleanup pass completed. Route structure, copy, and hierarchy wer
 2. `/campaigns`
 3. `/campaigns/new`
 4. `/campaigns/[campaignId]`
-5. `/products`
-6. `/assets`
-7. `/templates`
-8. `/brand`
-9. `/settings`
-10. `/tutorials`
+5. `/campaigns/[campaignId]/try-on`
+6. `/products`
+7. `/assets`
+8. `/templates`
+9. `/brand`
+10. `/settings`
+11. `/tutorials`
 
 ## Next UI Pass
 
@@ -47,3 +49,4 @@ Status: Initial cleanup pass completed. Route structure, copy, and hierarchy wer
 2. Push more routes toward image-led layouts.
 3. Expand the floating composer pattern beyond campaign detail.
 4. Replace placeholder surfaces with real data where available.
+5. Keep fixed panels and bottom composers fully reachable at narrower widths.

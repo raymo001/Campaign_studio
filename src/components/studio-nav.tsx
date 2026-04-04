@@ -6,51 +6,99 @@ import { primaryNavigation } from "@/lib/navigation";
 
 export function StudioNav() {
   const pathname = usePathname();
+  const mobileNavigation = primaryNavigation.slice(0, 5);
 
   return (
-    <aside className="hidden border-r border-white/6 bg-[#0a0d0c] lg:flex lg:w-[88px] lg:flex-col lg:items-center lg:py-5">
-      <div className="flex h-full w-full flex-col items-center justify-between">
-        <div className="flex flex-col items-center gap-5">
+    <>
+      <div className="sticky top-0 z-30 border-b border-white/6 bg-[rgba(10,13,12,0.92)] px-4 py-3 backdrop-blur-xl lg:hidden">
+        <div className="flex items-center justify-between gap-3">
           <Link
             href="/"
-            className="flex h-12 w-12 items-center justify-center rounded-2xl border border-white/8 bg-white/[0.03] text-white shadow-[0_18px_50px_rgba(0,0,0,0.35)]"
+            className="flex h-11 w-11 items-center justify-center rounded-2xl border border-white/8 bg-white/[0.03] text-white shadow-[0_18px_50px_rgba(0,0,0,0.35)]"
           >
             <span className="display text-xl leading-none">V</span>
           </Link>
-
-          <nav className="flex flex-col items-center gap-2">
-            {primaryNavigation.map((item) => {
-              const active =
-                pathname === item.href ||
-                (item.href !== "/" && pathname.startsWith(item.href));
-
-              return (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  title={item.label}
-                  aria-label={item.label}
-                  className={`group flex h-12 w-12 items-center justify-center rounded-2xl border transition ${
-                    active
-                      ? "border-[rgba(58,147,122,0.7)] bg-[rgba(31,102,86,0.42)] text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]"
-                      : "border-transparent bg-transparent text-white/44 hover:border-white/8 hover:bg-white/[0.03] hover:text-white/82"
-                  }`}
-                >
-                  <NavIcon type={item.icon} />
-                </Link>
-              );
-            })}
-          </nav>
-        </div>
-
-        <div className="flex flex-col items-center gap-3">
-          <div className="h-10 w-px bg-white/8" />
-          <div className="flex h-10 w-10 items-center justify-center rounded-full border border-white/8 bg-black/35 text-sm text-white/88">
-            N
+          <div className="min-w-0">
+            <div className="truncate text-sm font-semibold text-white">Vanpella Campaign Studio</div>
           </div>
+          <Link
+            href="/campaigns/new"
+            className="rounded-full border border-white/8 bg-white/[0.03] px-4 py-2 text-sm text-white/84"
+          >
+            New
+          </Link>
         </div>
       </div>
-    </aside>
+
+      <aside className="hidden border-r border-white/6 bg-[#0a0d0c] lg:flex lg:w-[88px] lg:flex-col lg:items-center lg:py-5">
+        <div className="flex h-full w-full flex-col items-center justify-between">
+          <div className="flex flex-col items-center gap-5">
+            <Link
+              href="/"
+              className="flex h-12 w-12 items-center justify-center rounded-2xl border border-white/8 bg-white/[0.03] text-white shadow-[0_18px_50px_rgba(0,0,0,0.35)]"
+            >
+              <span className="display text-xl leading-none">V</span>
+            </Link>
+
+            <nav className="flex flex-col items-center gap-2">
+              {primaryNavigation.map((item) => {
+                const active =
+                  pathname === item.href ||
+                  (item.href !== "/" && pathname.startsWith(item.href));
+
+                return (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    title={item.label}
+                    aria-label={item.label}
+                    className={`group flex h-12 w-12 items-center justify-center rounded-2xl border transition ${
+                      active
+                        ? "border-[rgba(58,147,122,0.7)] bg-[rgba(31,102,86,0.42)] text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]"
+                        : "border-transparent bg-transparent text-white/44 hover:border-white/8 hover:bg-white/[0.03] hover:text-white/82"
+                    }`}
+                  >
+                    <NavIcon type={item.icon} />
+                  </Link>
+                );
+              })}
+            </nav>
+          </div>
+
+          <div className="flex flex-col items-center gap-3">
+            <div className="h-10 w-px bg-white/8" />
+            <div className="flex h-10 w-10 items-center justify-center rounded-full border border-white/8 bg-black/35 text-sm text-white/88">
+              N
+            </div>
+          </div>
+        </div>
+      </aside>
+
+      <div className="fixed inset-x-0 bottom-0 z-40 border-t border-white/6 bg-[rgba(10,13,12,0.94)] px-2 py-2 backdrop-blur-xl lg:hidden">
+        <nav className="grid grid-cols-5 gap-1">
+          {mobileNavigation.map((item) => {
+            const active =
+              pathname === item.href ||
+              (item.href !== "/" && pathname.startsWith(item.href));
+
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={`flex min-h-[58px] flex-col items-center justify-center rounded-2xl border px-2 py-2 text-center transition ${
+                  active
+                    ? "border-[rgba(58,147,122,0.7)] bg-[rgba(31,102,86,0.34)] text-white"
+                    : "border-transparent text-white/46"
+                }`}
+              >
+                <NavIcon type={item.icon} />
+                <span className="mt-1 text-[10px] text-white/58">{item.label}</span>
+              </Link>
+            );
+          })}
+        </nav>
+      </div>
+    </>
   );
 }
 

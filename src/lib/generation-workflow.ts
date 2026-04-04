@@ -32,6 +32,7 @@ type GenerationRequest = Pick<
 > & {
   campaignId: string;
   personaId?: string;
+  productSkus?: string[];
   useCase?: PromptUseCase;
   direction?: string;
   uploadedReferences?: UploadedReferenceImage[];
@@ -44,7 +45,9 @@ export async function runCampaignImageGeneration(input: GenerationRequest) {
   }
 
   const campaign = detail.campaign;
-  const products = detail.products;
+  const products = input.productSkus?.length
+    ? detail.products.filter((product) => input.productSkus?.includes(product.sku))
+    : detail.products;
   const persona = input.personaId ? await getPersonaFromConvex(input.personaId) : null;
   if (products.length === 0) {
     throw new Error("Campaign has no synced products attached.");
@@ -58,12 +61,13 @@ export async function runCampaignImageGeneration(input: GenerationRequest) {
         objective: campaign.objective,
         primaryPlatform: campaign.primaryPlatform,
         platformMix: campaign.platformMix,
-        locale: campaign.locale,
-        audienceAngle: campaign.audienceAngle,
-        productSkus: campaign.productSkus,
-      },
+      locale: campaign.locale,
+      audienceAngle: campaign.audienceAngle,
+      productSkus: input.productSkus?.length ? input.productSkus : campaign.productSkus,
+    },
       products,
     );
+  const sourceProductSkus = products.map((product) => product.sku);
 
   const referenceAnalysis = await analyzeReferenceImages(input.uploadedReferences ?? []);
   const uploadedReferenceRecords = await Promise.all(
@@ -121,6 +125,7 @@ export async function runCampaignImageGeneration(input: GenerationRequest) {
   const promptSpec = {
     useCase: input.useCase ?? "product-highlight",
     personaId: persona?._id,
+    sourceProductSkus,
     referenceCues: buildReferenceCueStrings(referenceAnalysis),
     direction: input.direction,
     uploadedReferences: uploadedReferenceRecords,
@@ -137,7 +142,7 @@ export async function runCampaignImageGeneration(input: GenerationRequest) {
     model: requestedModel,
     prompt,
     promptSpec,
-    sourceProductSkus: campaign.productSkus,
+    sourceProductSkus,
   });
 
   try {
@@ -180,7 +185,7 @@ export async function runCampaignImageGeneration(input: GenerationRequest) {
       provider: result.provider,
       model: result.model,
       status: "ready",
-      sourceProductSkus: campaign.productSkus,
+      sourceProductSkus,
       r2Key: upload.key,
       publicUrl: upload.publicUrl,
       aspectRatio: input.aspectRatio,

@@ -123,6 +123,57 @@ export const getDetail = query({
   },
 });
 
+export const getOverview = query({
+  args: {},
+  handler: async (ctx) => {
+    const [recentCampaigns, allCampaigns, allProducts, allAssets] = await Promise.all([
+      ctx.db.query("campaigns").order("desc").take(12),
+      ctx.db.query("campaigns").collect(),
+      ctx.db.query("products").collect(),
+      ctx.db.query("assets").collect(),
+    ]);
+
+    const exportedCount = allAssets.filter((asset) => asset.exportStatus === "exported").length;
+
+    return {
+      counts: {
+        campaigns: allCampaigns.length,
+        products: allProducts.length,
+        assets: allAssets.length,
+        exports: exportedCount,
+      },
+      recentCampaigns: recentCampaigns.slice(0, 4),
+      recentAssets: allAssets
+        .sort((left, right) => right.createdAt - left.createdAt)
+        .slice(0, 8),
+    };
+  },
+});
+
+export const listAssets = query({
+  args: {
+    limit: v.optional(v.number()),
+  },
+  handler: async (ctx, args) => {
+    const assets = await ctx.db.query("assets").order("desc").take(Math.min(args.limit ?? 60, 120));
+
+    return Promise.all(
+      assets.map(async (asset) => {
+        const campaign = asset.campaignId ? await ctx.db.get(asset.campaignId) : null;
+        const job = asset.generationJobId ? await ctx.db.get(asset.generationJobId) : null;
+        const persona = asset.personaId ? await ctx.db.get(asset.personaId) : null;
+
+        return {
+          ...asset,
+          campaignName: campaign?.name,
+          useCase: job?.useCase,
+          personaName: persona?.name,
+        };
+      }),
+    );
+  },
+});
+
 export const createBriefDraft = mutation({
   args: {
     campaignId: v.id("campaigns"),
@@ -222,9 +273,48 @@ export const createAsset = mutation({
     height: v.optional(v.number()),
   },
   handler: async (ctx, args) => {
+    const now = Date.now();
     return ctx.db.insert("assets", {
       ...args,
-      createdAt: Date.now(),
+      reviewStatus: "draft",
+      exportStatus: "not-exported",
+      createdAt: now,
+      updatedAt: now,
     });
+  },
+});
+
+export const updateAssetWorkflowState = mutation({
+  args: {
+    assetId: v.id("assets"),
+    reviewStatus: v.optional(v.string()),
+    exportStatus: v.optional(v.string()),
+  },
+  handler: async (ctx, args) => {
+    const asset = await ctx.db.get(args.assetId);
+    if (!asset) {
+      throw new Error("Asset not found.");
+    }
+
+    const reviewStatus = args.reviewStatus ?? asset.reviewStatus ?? "draft";
+    const exportStatus = args.exportStatus ?? asset.exportStatus ?? "not-exported";
+    const patch: Record<string, unknown> = {
+      reviewStatus,
+      exportStatus,
+      updatedAt: Date.now(),
+    };
+
+    if (exportStatus === "exported") {
+      patch.exportedAt = Date.now();
+    } else if (exportStatus === "not-exported") {
+      patch.exportedAt = undefined;
+    }
+
+    await ctx.db.patch(args.assetId, patch);
+    return {
+      assetId: args.assetId,
+      reviewStatus,
+      exportStatus,
+    };
   },
 });

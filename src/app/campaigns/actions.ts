@@ -4,21 +4,23 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { buildCampaignBrief } from "@/lib/campaigns";
 import {
+  attachPersonaReferenceImageInConvex,
   createPersonaInConvex,
   createCampaignWithBriefInConvex,
   getCampaignDetailFromConvex,
   listProductsFromConvex,
+  updateAssetWorkflowStateInConvex,
 } from "@/lib/convex-server";
 import { runCampaignImageGeneration } from "@/lib/generation-workflow";
 import { geminiSupportedImageSizes } from "@/lib/image-providers";
 import { promptUseCaseOptions } from "@/lib/prompt-system";
 import { readImageFilesFromFormData } from "@/lib/reference-images";
+import { resolveAssetWorkflowState } from "@/lib/asset-workflow";
 import {
   buildPersonaReferenceKey,
   inferFileExtension,
   uploadAssetToR2,
 } from "@/lib/r2";
-import { attachPersonaReferenceImageInConvex } from "@/lib/convex-server";
 
 export async function createCampaignAction(formData: FormData) {
   const name = String(formData.get("name") || "").trim();
@@ -117,6 +119,70 @@ export async function generateCampaignImageAction(formData: FormData) {
   revalidatePath(`/campaigns/${campaignId}`);
   revalidatePath("/campaigns");
   redirect(`/campaigns/${campaignId}`);
+}
+
+export async function runTryOnGenerationAction(formData: FormData) {
+  const campaignId = String(formData.get("campaignId") || "").trim();
+  const provider = String(formData.get("provider") || "gemini").trim();
+  const personaId = String(formData.get("personaId") || "").trim();
+  const productSku = String(formData.get("productSku") || "").trim();
+  const direction = String(formData.get("direction") || "").trim();
+  const aspectRatio = String(formData.get("aspectRatio") || "4:5").trim();
+  const imageSize = String(formData.get("imageSize") || "2K").trim();
+  const size = String(formData.get("size") || "").trim();
+  const uploadedReferences = await readImageFilesFromFormData(formData, "referenceFiles", 3);
+
+  if (!campaignId || !productSku) {
+    throw new Error("Campaign and product are required for try-on.");
+  }
+
+  await runCampaignImageGeneration({
+    campaignId,
+    provider: provider as "gemini" | "openai" | "seedream",
+    personaId: personaId || undefined,
+    productSkus: [productSku],
+    useCase: "try-on",
+    direction: direction || undefined,
+    uploadedReferences,
+    aspectRatio: aspectRatio || undefined,
+    imageSize: geminiSupportedImageSizes.includes(
+      imageSize as (typeof geminiSupportedImageSizes)[number],
+    )
+      ? (imageSize as (typeof geminiSupportedImageSizes)[number])
+      : undefined,
+    size: size || undefined,
+  });
+
+  revalidatePath(`/campaigns/${campaignId}`);
+  revalidatePath(`/campaigns/${campaignId}/try-on`);
+  revalidatePath("/assets");
+  redirect(`/campaigns/${campaignId}/try-on`);
+}
+
+export async function updateAssetWorkflowAction(formData: FormData) {
+  const assetId = String(formData.get("assetId") || "").trim();
+  const redirectTo = String(formData.get("redirectTo") || "/assets").trim();
+  const reviewStatus = String(formData.get("reviewStatus") || "").trim();
+  const exportStatus = String(formData.get("exportStatus") || "").trim();
+
+  if (!assetId) {
+    throw new Error("Asset is required.");
+  }
+
+  const nextState = resolveAssetWorkflowState({
+    nextReviewStatus: reviewStatus || undefined,
+    nextExportStatus: exportStatus || undefined,
+  });
+
+  await updateAssetWorkflowStateInConvex({
+    assetId,
+    reviewStatus: nextState.reviewStatus,
+    exportStatus: nextState.exportStatus,
+  });
+
+  revalidatePath("/assets");
+  revalidatePath(redirectTo);
+  redirect(redirectTo);
 }
 
 export async function createPersonaAction(formData: FormData) {

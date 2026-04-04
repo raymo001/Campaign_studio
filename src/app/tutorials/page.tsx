@@ -27,11 +27,11 @@ const guides = [
 
 export default function TutorialsPage() {
   return (
-    <div className="mx-auto max-w-[1480px] px-5 py-6 sm:px-7 lg:px-9">
+    <div className="mx-auto max-w-[1480px] px-4 py-5 sm:px-7 sm:py-6 lg:px-9">
       <div className="grid gap-6">
         <section className="rounded-[32px] border border-white/6 bg-white/[0.016] px-6 py-6 sm:px-8">
           <div className="eyebrow">Tutorials</div>
-          <h1 className="mt-3 text-4xl font-semibold tracking-[-0.04em] text-white sm:text-5xl">
+          <h1 className="mt-3 text-3xl font-semibold tracking-[-0.04em] text-white sm:text-5xl">
             Tutorials and help.
           </h1>
           <p className="mt-4 max-w-3xl text-base leading-7 text-white/44">

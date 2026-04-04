@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useFormStatus } from "react-dom";
 import { generateCampaignImageAction } from "@/app/campaigns/actions";
 import { getGeminiImageModels } from "@/lib/image-providers";
@@ -45,6 +45,27 @@ export function GenerationComposer({
   const [direction, setDirection] = useState(defaultHook || "");
   const [files, setFiles] = useState<File[]>([]);
 
+  useEffect(() => {
+    if (!settingsOpen) {
+      return;
+    }
+
+    const previousOverflow = document.body.style.overflow;
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setSettingsOpen(false);
+      }
+    };
+
+    document.body.style.overflow = "hidden";
+    window.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [settingsOpen]);
+
   const providerCards = useMemo(
     () => [
       {
@@ -80,10 +101,10 @@ export function GenerationComposer({
         <div className="fixed inset-0 z-40 bg-black/55 backdrop-blur-sm" onClick={() => setSettingsOpen(false)} />
       ) : null}
 
-      <div className="fixed inset-x-0 bottom-4 z-50 flex justify-center px-4">
+      <div className="fixed inset-x-0 bottom-[78px] z-50 flex justify-center px-3 lg:bottom-4 lg:px-4">
         <form
           action={generateCampaignImageAction}
-          className="relative w-full max-w-[980px] rounded-[30px] border border-white/7 bg-[rgba(15,17,16,0.96)] p-3 shadow-[0_26px_80px_rgba(0,0,0,0.46)] backdrop-blur-xl"
+          className="relative w-full max-w-[980px] rounded-[28px] border border-white/7 bg-[rgba(15,17,16,0.96)] p-3 shadow-[0_26px_80px_rgba(0,0,0,0.46)] backdrop-blur-xl sm:rounded-[30px]"
         >
           <input type="hidden" name="campaignId" value={campaignId} />
           <input type="hidden" name="provider" value={provider} />
@@ -94,7 +115,7 @@ export function GenerationComposer({
           <input type="hidden" name="size" value={size} />
           <input type="hidden" name="personaId" value={personaId} />
 
-          <div className="grid gap-3 lg:grid-cols-[112px_minmax(0,1fr)_auto] lg:items-end">
+          <div className="grid gap-3 md:grid-cols-[112px_minmax(0,1fr)] md:items-end lg:grid-cols-[112px_minmax(0,1fr)_auto]">
             <div className="grid gap-2">
               <button
                 type="button"
@@ -149,11 +170,11 @@ export function GenerationComposer({
               </div>
             </div>
 
-            <div className="flex items-end gap-2">
+            <div className="grid grid-cols-2 gap-2 md:col-span-2 lg:flex lg:items-end lg:justify-end">
               <button
                 type="button"
                 onClick={() => setSettingsOpen(true)}
-                className="flex h-15 min-w-[108px] items-center justify-center gap-2 rounded-[18px] border border-white/8 bg-white/[0.03] px-4 text-sm font-medium text-white/80 transition hover:border-white/14 hover:bg-white/[0.05]"
+                className="flex h-14 w-full items-center justify-center gap-2 rounded-[18px] border border-white/8 bg-white/[0.03] px-4 text-sm font-medium text-white/80 transition hover:border-white/14 hover:bg-white/[0.05] lg:h-15 lg:min-w-[116px] lg:w-auto"
               >
                 <SlidersIcon />
                 <span className="text-xs tracking-[0.08em] text-white/44">
@@ -164,147 +185,148 @@ export function GenerationComposer({
             </div>
           </div>
 
-          {settingsOpen ? (
-            <div className="absolute bottom-[calc(100%+18px)] left-1/2 w-full max-w-[960px] -translate-x-1/2 rounded-[32px] border border-white/7 bg-[rgba(14,15,15,0.98)] p-5 shadow-[0_40px_120px_rgba(0,0,0,0.58)]">
-              <div className="flex items-center justify-between gap-3 pb-4">
-                <div className="text-2xl font-semibold text-white">Settings</div>
-                <button
-                  type="button"
-                  onClick={() => setSettingsOpen(false)}
-                  className="rounded-full border border-white/8 px-4 py-2 text-sm text-white/62 transition hover:border-white/14 hover:text-white"
-                >
-                  Done
-                </button>
-              </div>
-
-              <div className="grid gap-5 xl:grid-cols-[minmax(0,1.15fr)_360px]">
-                <div className="min-w-0 rounded-[26px] border border-white/6 bg-white/[0.018] p-4">
-                  <div className="mb-4 flex flex-wrap items-center gap-2">
-                    <span className="rounded-full border border-white/8 px-3 py-1 text-[11px] uppercase tracking-[0.18em] text-white/34">
-                      Providers
-                    </span>
-                    <span className="rounded-full border border-white/8 px-3 py-1 text-[11px] uppercase tracking-[0.18em] text-white/34">
-                      Models
-                    </span>
-                  </div>
-                  <div className="grid gap-3 sm:grid-cols-3">
-                    {providerCards.map((card) => {
-                      const active = provider === card.id;
-                      return (
-                        <button
-                          key={card.id}
-                          type="button"
-                          onClick={() =>
-                            setProvider(card.id as "gemini" | "openai" | "seedream")
-                          }
-                          className={`rounded-[20px] border px-4 py-4 text-left transition ${
-                            active
-                              ? "border-[rgba(254,104,22,0.55)] bg-[rgba(254,104,22,0.08)] text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]"
-                              : "border-white/7 bg-black/12 text-white/72 hover:border-white/14"
-                          }`}
-                        >
-                          <div className="text-base font-semibold">{card.label}</div>
-                          <div className="mt-2 text-[11px] leading-5 text-white/34">{card.detail}</div>
-                        </button>
-                      );
-                    })}
-                  </div>
-                </div>
-
-                <div className="grid gap-4">
-                  <SettingsBlock title="Image setup">
-                    <SettingsField label="Use case">
-                      <select
-                        value={useCase}
-                        onChange={(event) =>
-                          setUseCase(event.currentTarget.value as (typeof promptUseCaseOptions)[number])
-                        }
-                        className="h-11 rounded-[16px] border border-white/8 bg-black/18 px-3 text-sm text-white outline-none"
-                      >
-                        {promptUseCaseOptions.map((option) => (
-                          <option key={option} value={option} className="bg-[var(--color-panel)]">
-                            {option}
-                          </option>
-                        ))}
-                      </select>
-                    </SettingsField>
-
-                    <SettingsField label="Persona">
-                      <select
-                        value={personaId}
-                        onChange={(event) => setPersonaId(event.currentTarget.value)}
-                        className="h-11 rounded-[16px] border border-white/8 bg-black/18 px-3 text-sm text-white outline-none"
-                      >
-                        <option value="" className="bg-[var(--color-panel)]">
-                          No persona
-                        </option>
-                        {personas.map((persona) => (
-                          <option key={persona.id} value={persona.id} className="bg-[var(--color-panel)]">
-                            {persona.name}
-                          </option>
-                        ))}
-                      </select>
-                    </SettingsField>
-
-                    <SettingsField label="Model override">
-                      <input
-                        value={model}
-                        onChange={(event) => setModel(event.currentTarget.value)}
-                        placeholder={provider === "gemini" ? getGeminiImageModels()[0] : provider === "openai" ? "gpt-image-1.5" : "seedream-4-5-251128"}
-                        className="h-11 rounded-[16px] border border-white/8 bg-black/18 px-3 text-sm text-white outline-none"
-                      />
-                    </SettingsField>
-                  </SettingsBlock>
-
-                  <SettingsBlock title="Format">
-                    <SettingsField label="Aspect ratio">
-                      <select
-                        value={aspectRatio}
-                        onChange={(event) => setAspectRatio(event.currentTarget.value)}
-                        className="h-11 rounded-[16px] border border-white/8 bg-black/18 px-3 text-sm text-white outline-none"
-                      >
-                        {geminiAspectRatios.map((ratio) => (
-                          <option key={ratio} value={ratio} className="bg-[var(--color-panel)]">
-                            {ratio}
-                          </option>
-                        ))}
-                      </select>
-                    </SettingsField>
-
-                    <SettingsField label="Gemini resolution">
-                      <div className="flex flex-wrap gap-2">
-                        {geminiImageSizes.map((value) => (
-                          <button
-                            key={value}
-                            type="button"
-                            onClick={() => setImageSize(value)}
-                            className={`rounded-full border px-3 py-2 text-sm transition ${
-                              imageSize === value
-                                ? "border-white/20 bg-white/[0.08] text-white"
-                                : "border-white/8 text-white/52"
-                            }`}
-                          >
-                            {value}
-                          </button>
-                        ))}
-                      </div>
-                    </SettingsField>
-
-                    <SettingsField label="Pixel size override">
-                      <input
-                        value={size}
-                        onChange={(event) => setSize(event.currentTarget.value)}
-                        placeholder={`${openAiSizes[0]} or ${seedreamSizes[0]}`}
-                        className="h-11 rounded-[16px] border border-white/8 bg-black/18 px-3 text-sm text-white outline-none"
-                      />
-                    </SettingsField>
-                  </SettingsBlock>
-                </div>
-              </div>
-            </div>
-          ) : null}
         </form>
       </div>
+
+      {settingsOpen ? (
+        <div className="fixed inset-x-3 top-3 bottom-[156px] z-[60] overflow-y-auto rounded-[28px] border border-white/7 bg-[rgba(14,15,15,0.985)] p-4 shadow-[0_40px_120px_rgba(0,0,0,0.58)] lg:inset-x-auto lg:left-1/2 lg:top-auto lg:bottom-[132px] lg:w-[min(960px,calc(100vw-64px))] lg:max-h-[min(80vh,760px)] lg:-translate-x-1/2 lg:rounded-[32px] lg:p-5">
+          <div className="sticky top-0 z-10 -mx-4 -mt-4 mb-4 flex items-center justify-between gap-3 rounded-t-[28px] bg-[rgba(14,15,15,0.985)] px-4 py-4 lg:static lg:m-0 lg:rounded-none lg:bg-transparent lg:px-0 lg:py-0 lg:pb-4">
+            <div className="text-2xl font-semibold text-white">Settings</div>
+            <button
+              type="button"
+              onClick={() => setSettingsOpen(false)}
+              className="rounded-full border border-white/8 px-4 py-2 text-sm text-white/62 transition hover:border-white/14 hover:text-white"
+            >
+              Done
+            </button>
+          </div>
+
+          <div className="grid gap-4 xl:grid-cols-[minmax(0,1.15fr)_360px]">
+            <div className="min-w-0 rounded-[26px] border border-white/6 bg-white/[0.018] p-4">
+              <div className="mb-4 flex flex-wrap items-center gap-2">
+                <span className="rounded-full border border-white/8 px-3 py-1 text-[11px] uppercase tracking-[0.18em] text-white/34">
+                  Providers
+                </span>
+                <span className="rounded-full border border-white/8 px-3 py-1 text-[11px] uppercase tracking-[0.18em] text-white/34">
+                  Models
+                </span>
+              </div>
+              <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+                {providerCards.map((card) => {
+                  const active = provider === card.id;
+                  return (
+                    <button
+                      key={card.id}
+                      type="button"
+                      onClick={() =>
+                        setProvider(card.id as "gemini" | "openai" | "seedream")
+                      }
+                      className={`rounded-[20px] border px-4 py-4 text-left transition ${
+                        active
+                          ? "border-[rgba(254,104,22,0.55)] bg-[rgba(254,104,22,0.08)] text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]"
+                          : "border-white/7 bg-black/12 text-white/72 hover:border-white/14"
+                      }`}
+                    >
+                      <div className="text-base font-semibold">{card.label}</div>
+                      <div className="mt-2 text-[11px] leading-5 text-white/34">{card.detail}</div>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            <div className="grid gap-4">
+              <SettingsBlock title="Image setup">
+                <SettingsField label="Use case">
+                  <select
+                    value={useCase}
+                    onChange={(event) =>
+                      setUseCase(event.currentTarget.value as (typeof promptUseCaseOptions)[number])
+                    }
+                    className="h-11 rounded-[16px] border border-white/8 bg-black/18 px-3 text-sm text-white outline-none"
+                  >
+                    {promptUseCaseOptions.map((option) => (
+                      <option key={option} value={option} className="bg-[var(--color-panel)]">
+                        {option}
+                      </option>
+                    ))}
+                  </select>
+                </SettingsField>
+
+                <SettingsField label="Persona">
+                  <select
+                    value={personaId}
+                    onChange={(event) => setPersonaId(event.currentTarget.value)}
+                    className="h-11 rounded-[16px] border border-white/8 bg-black/18 px-3 text-sm text-white outline-none"
+                  >
+                    <option value="" className="bg-[var(--color-panel)]">
+                      No persona
+                    </option>
+                    {personas.map((persona) => (
+                      <option key={persona.id} value={persona.id} className="bg-[var(--color-panel)]">
+                        {persona.name}
+                      </option>
+                    ))}
+                  </select>
+                </SettingsField>
+
+                <SettingsField label="Model override">
+                  <input
+                    value={model}
+                    onChange={(event) => setModel(event.currentTarget.value)}
+                    placeholder={provider === "gemini" ? getGeminiImageModels()[0] : provider === "openai" ? "gpt-image-1.5" : "seedream-4-5-251128"}
+                    className="h-11 rounded-[16px] border border-white/8 bg-black/18 px-3 text-sm text-white outline-none"
+                  />
+                </SettingsField>
+              </SettingsBlock>
+
+              <SettingsBlock title="Format">
+                <SettingsField label="Aspect ratio">
+                  <select
+                    value={aspectRatio}
+                    onChange={(event) => setAspectRatio(event.currentTarget.value)}
+                    className="h-11 rounded-[16px] border border-white/8 bg-black/18 px-3 text-sm text-white outline-none"
+                  >
+                    {geminiAspectRatios.map((ratio) => (
+                      <option key={ratio} value={ratio} className="bg-[var(--color-panel)]">
+                        {ratio}
+                      </option>
+                    ))}
+                  </select>
+                </SettingsField>
+
+                <SettingsField label="Gemini resolution">
+                  <div className="flex flex-wrap gap-2">
+                    {geminiImageSizes.map((value) => (
+                      <button
+                        key={value}
+                        type="button"
+                        onClick={() => setImageSize(value)}
+                        className={`rounded-full border px-3 py-2 text-sm transition ${
+                          imageSize === value
+                            ? "border-white/20 bg-white/[0.08] text-white"
+                            : "border-white/8 text-white/52"
+                        }`}
+                      >
+                        {value}
+                      </button>
+                    ))}
+                  </div>
+                </SettingsField>
+
+                <SettingsField label="Pixel size override">
+                  <input
+                    value={size}
+                    onChange={(event) => setSize(event.currentTarget.value)}
+                    placeholder={`${openAiSizes[0]} or ${seedreamSizes[0]}`}
+                    className="h-11 rounded-[16px] border border-white/8 bg-black/18 px-3 text-sm text-white outline-none"
+                  />
+                </SettingsField>
+              </SettingsBlock>
+            </div>
+          </div>
+        </div>
+      ) : null}
     </>
   );
 }
@@ -316,7 +338,7 @@ function SubmitButton() {
     <button
       type="submit"
       disabled={pending}
-      className="h-15 min-w-[160px] rounded-[20px] bg-[var(--color-orange)] px-6 text-lg font-semibold text-white shadow-[0_20px_46px_rgba(254,104,22,0.28)] transition hover:brightness-105 disabled:cursor-wait disabled:opacity-70"
+      className="h-14 w-full rounded-[20px] bg-[var(--color-orange)] px-6 text-lg font-semibold text-white shadow-[0_20px_46px_rgba(254,104,22,0.28)] transition hover:brightness-105 disabled:cursor-wait disabled:opacity-70 lg:h-15 lg:min-w-[160px] lg:w-auto"
     >
       {pending ? "Creating..." : "Create"}
     </button>

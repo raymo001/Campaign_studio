@@ -1,6 +1,6 @@
 # Backend Foundation
 
-Date: March 21, 2026
+Date: April 4, 2026
 
 ## What Is Implemented
 
@@ -47,6 +47,8 @@ These provide server-side helpers for:
 
 - querying products
 - querying campaigns
+- querying overview metrics
+- querying the asset library
 - querying personas
 - creating campaigns with their initial brief
 - creating persona records
@@ -73,12 +75,15 @@ Behavior:
 - the prompt system supports product highlight, try-on, and persona-editorial use cases
 - personas can now be created and reused during generation
 - generation jobs can now store `useCase`, `personaId`, and prompt metadata
+- generation can now be narrowed to a selected product SKU for dedicated try-on flows
 - persona-editorial generations can automatically update the persona reference image for later try-on use
 - uploaded reference images can be added from the computer, uploaded to R2, and analyzed into prompt cues
 - the campaign detail screen now exposes job-level prompt influence, including persona linkage, uploaded references, and extracted cue tags
 - `/campaigns/[campaignId]` reads the full campaign detail model from Convex
+- `/campaigns/[campaignId]/try-on` now provides a dedicated try-on workspace for product, persona, and uploaded face-reference generation
 - generation creates a job record, runs the chosen provider, uploads the image to R2, then stores the asset record in Convex
 - failed generations are written back to `generationJobs.errorMessage`
+- assets now support `reviewStatus` and `exportStatus` workflow state in addition to the underlying generation `status`
 
 ### API route
 
@@ -93,15 +98,16 @@ Methods:
 
 Pages now read real Convex data:
 
+- [src/app/page.tsx](/Users/biatyraymond/Documents/Campaign_Studio/src/app/page.tsx)
+- [src/app/assets/page.tsx](/Users/biatyraymond/Documents/Campaign_Studio/src/app/assets/page.tsx)
 - [src/app/products/page.tsx](/Users/biatyraymond/Documents/Campaign_Studio/src/app/products/page.tsx)
 - [src/app/campaigns/page.tsx](/Users/biatyraymond/Documents/Campaign_Studio/src/app/campaigns/page.tsx)
 - [src/app/campaigns/new/page.tsx](/Users/biatyraymond/Documents/Campaign_Studio/src/app/campaigns/new/page.tsx)
 - [src/app/campaigns/[campaignId]/page.tsx](/Users/biatyraymond/Documents/Campaign_Studio/src/app/campaigns/[campaignId]/page.tsx)
+- [src/app/campaigns/[campaignId]/try-on/page.tsx](/Users/biatyraymond/Documents/Campaign_Studio/src/app/campaigns/[campaignId]/try-on/page.tsx)
 
 Supporting product routes are also in place:
 
-- [src/app/page.tsx](/Users/biatyraymond/Documents/Campaign_Studio/src/app/page.tsx)
-- [src/app/assets/page.tsx](/Users/biatyraymond/Documents/Campaign_Studio/src/app/assets/page.tsx)
 - [src/app/templates/page.tsx](/Users/biatyraymond/Documents/Campaign_Studio/src/app/templates/page.tsx)
 - [src/app/brand/page.tsx](/Users/biatyraymond/Documents/Campaign_Studio/src/app/brand/page.tsx)
 - [src/app/personas/page.tsx](/Users/biatyraymond/Documents/Campaign_Studio/src/app/personas/page.tsx)
@@ -119,6 +125,7 @@ Test coverage currently focuses on:
 - Seedream size matrix
 - brief generation and prompt construction
 - R2 key and public URL construction
+- asset review/export workflow transitions
 
 Files:
 
@@ -127,6 +134,7 @@ Files:
 - [tests/campaign-workflow.test.ts](/Users/biatyraymond/Documents/Campaign_Studio/tests/campaign-workflow.test.ts)
 - [tests/prompt-system.test.ts](/Users/biatyraymond/Documents/Campaign_Studio/tests/prompt-system.test.ts)
 - [tests/reference-images.test.ts](/Users/biatyraymond/Documents/Campaign_Studio/tests/reference-images.test.ts)
+- [tests/asset-workflow.test.ts](/Users/biatyraymond/Documents/Campaign_Studio/tests/asset-workflow.test.ts)
 
 Run with:
 

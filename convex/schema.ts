@@ -122,6 +122,8 @@ export default defineSchema({
     provider: v.string(),
     model: v.string(),
     status: v.string(),
+    reviewStatus: v.optional(v.string()),
+    exportStatus: v.optional(v.string()),
     sourceProductSkus: v.array(v.string()),
     r2Key: v.optional(v.string()),
     publicUrl: v.optional(v.string()),
@@ -130,9 +132,13 @@ export default defineSchema({
     width: v.optional(v.number()),
     height: v.optional(v.number()),
     createdAt: v.number(),
+    updatedAt: v.optional(v.number()),
+    exportedAt: v.optional(v.number()),
   })
     .index("by_campaign", ["campaignId"])
-    .index("by_generation_job", ["generationJobId"]),
+    .index("by_generation_job", ["generationJobId"])
+    .index("by_review_status", ["reviewStatus"])
+    .index("by_export_status", ["exportStatus"]),
 
   personas: defineTable({
     name: v.string(),

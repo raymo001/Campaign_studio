@@ -10,11 +10,11 @@ export default async function NewCampaignPage() {
   const products = await listProductsFromConvex(100).catch(() => []);
 
   return (
-    <div className="mx-auto max-w-[1620px] px-5 py-6 sm:px-7 lg:px-9">
+    <div className="mx-auto max-w-[1620px] px-4 py-5 sm:px-7 sm:py-6 lg:px-9">
       <form action={createCampaignAction} className="grid gap-6">
         <header className="max-w-3xl">
           <div className="eyebrow">New campaign</div>
-          <h1 className="mt-3 text-4xl font-semibold tracking-[-0.04em] text-white sm:text-5xl">
+          <h1 className="mt-3 text-3xl font-semibold tracking-[-0.04em] text-white sm:text-5xl">
             Create a campaign.
           </h1>
           <p className="mt-4 text-base leading-7 text-white/42">
@@ -156,10 +156,10 @@ export default async function NewCampaignPage() {
           </section>
         </div>
 
-        <div className="flex justify-end">
+        <div className="flex justify-stretch sm:justify-end">
           <button
             type="submit"
-            className="rounded-full bg-[var(--color-orange)] px-7 py-3 text-sm font-semibold text-white shadow-[0_18px_44px_rgba(254,104,22,0.24)]"
+            className="w-full rounded-full bg-[var(--color-orange)] px-7 py-3 text-sm font-semibold text-white shadow-[0_18px_44px_rgba(254,104,22,0.24)] sm:w-auto"
           >
             Create Campaign
           </button>

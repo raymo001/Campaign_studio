@@ -9,6 +9,7 @@ flowchart TD
     A["/ Overview"] --> B["/campaigns"]
     B --> C["/campaigns/new"]
     B --> D["/campaigns/[campaignId]"]
+    D --> J["/campaigns/[campaignId]/try-on"]
     A --> E["/products"]
     A --> F["/assets"]
     A --> G["/templates"]
@@ -45,6 +46,13 @@ flowchart TD
 - source products
 - generated variants
 - review and approval queue
+
+### `/campaigns/[campaignId]/try-on`
+
+- dedicated try-on workspace
+- product + persona pairing
+- uploaded face/model references
+- recent try-on results
 
 ### `/products`
 

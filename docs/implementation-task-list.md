@@ -1,6 +1,6 @@
 # Implementation Task List
 
-Date: March 21, 2026
+Date: April 4, 2026
 
 ## Current Slice
 
@@ -33,6 +33,7 @@ Date: March 21, 2026
 - [ ] Create platform preset records and selection logic.
 - [x] Add prompt use-case selection to generation controls.
 - [ ] Add prompt use-case selection to campaign creation.
+- [x] Add a dedicated try-on route with product, persona, and reference-image controls.
 
 ### Generation Pipeline
 
@@ -43,20 +44,25 @@ Date: March 21, 2026
 
 ### Review System
 
-- [ ] Add approval and export states for assets.
+- [x] Add approval and export states for assets.
 - [x] Add campaign detail read model for brief + jobs + assets.
 - [x] Add review board UI backed by Convex queries.
 - [x] Expose prompt metadata, persona linkage, and uploaded reference cues in campaign job history.
+- [x] Add a live asset library with review/export controls.
 
 ### UI Polish
 
-- [ ] Replace placeholder assets and template previews with live data.
+- [x] Replace placeholder overview metrics with live Convex-backed metrics.
+- [x] Replace placeholder asset library cards with live asset data.
+- [ ] Replace placeholder template previews with live data.
 - [ ] Reduce card framing further on overview and index routes.
 - [ ] Carry the floating composer pattern into more creation flows.
-- [ ] Tighten spacing and hierarchy on mobile views.
+- [x] Tighten spacing and hierarchy on mobile views.
+- [x] Add explicit mobile navigation instead of hiding the shell below `lg`.
 
 ### Testing
 
 - [ ] Add integration tests for the feed sync route.
 - [ ] Add smoke-test scripts for Gemini, OpenAI, and Seedream image generation.
 - [x] Add workflow-level tests for brief generation and R2 asset URL construction.
+- [x] Add workflow-state tests for asset approval and export transitions.

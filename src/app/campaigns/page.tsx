@@ -5,12 +5,12 @@ export default async function CampaignsPage() {
   const campaigns = await listCampaignsFromConvex(20).catch(() => []);
 
   return (
-    <div className="mx-auto max-w-[1600px] px-5 py-6 sm:px-7 lg:px-9">
+    <div className="mx-auto max-w-[1600px] px-4 py-5 sm:px-7 sm:py-6 lg:px-9">
       <div className="grid gap-6">
         <header className="flex flex-col gap-5 xl:flex-row xl:items-end xl:justify-between">
           <div className="max-w-3xl">
             <div className="eyebrow">Campaigns</div>
-            <h1 className="mt-3 text-4xl font-semibold tracking-[-0.04em] text-white sm:text-5xl">
+            <h1 className="mt-3 text-3xl font-semibold tracking-[-0.04em] text-white sm:text-5xl">
               All campaigns.
             </h1>
           </div>
@@ -18,7 +18,7 @@ export default async function CampaignsPage() {
           <div className="flex flex-wrap gap-3">
             <Link
               href="/campaigns/new"
-              className="rounded-full bg-[var(--color-orange)] px-6 py-3 text-sm font-semibold text-white shadow-[0_18px_44px_rgba(254,104,22,0.24)]"
+              className="w-full rounded-full bg-[var(--color-orange)] px-6 py-3 text-center text-sm font-semibold text-white shadow-[0_18px_44px_rgba(254,104,22,0.24)] sm:w-auto"
             >
               New Campaign
             </Link>

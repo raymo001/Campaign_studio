@@ -27,6 +27,16 @@ export async function listCampaignsFromConvex(limit = 20) {
   return client.query(api.campaigns.list, { limit });
 }
 
+export async function getOverviewFromConvex() {
+  const client = getConvexServerClient();
+  return client.query(api.campaigns.getOverview, {});
+}
+
+export async function listAssetsFromConvex(limit = 60) {
+  const client = getConvexServerClient();
+  return client.query(api.campaigns.listAssets, { limit });
+}
+
 export async function listPersonasFromConvex(limit = 24) {
   const client = getConvexServerClient();
   return client.query(api.personas.list, { limit });
@@ -154,5 +164,18 @@ export async function createAssetInConvex(args: {
     campaignId: args.campaignId as never,
     generationJobId: args.generationJobId as never,
     personaId: args.personaId as never,
+  });
+}
+
+export async function updateAssetWorkflowStateInConvex(args: {
+  assetId: string;
+  reviewStatus?: string;
+  exportStatus?: string;
+}) {
+  const client = getConvexServerClient();
+  return client.mutation(api.campaigns.updateAssetWorkflowState, {
+    assetId: args.assetId as never,
+    reviewStatus: args.reviewStatus,
+    exportStatus: args.exportStatus,
   });
 }

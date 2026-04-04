@@ -9,11 +9,11 @@ const templateGroups = [
 
 export default function TemplatesPage() {
   return (
-    <div className="mx-auto max-w-[1600px] px-5 py-6 sm:px-7 lg:px-9">
+    <div className="mx-auto max-w-[1600px] px-4 py-5 sm:px-7 sm:py-6 lg:px-9">
       <div className="grid gap-6">
         <header className="max-w-3xl">
           <div className="eyebrow">Templates</div>
-          <h1 className="mt-3 text-4xl font-semibold tracking-[-0.04em] text-white sm:text-5xl">
+          <h1 className="mt-3 text-3xl font-semibold tracking-[-0.04em] text-white sm:text-5xl">
             Campaign templates.
           </h1>
         </header>

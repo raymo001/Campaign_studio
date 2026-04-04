@@ -34,7 +34,7 @@ export default function RootLayout({
         <div className="grid min-h-screen lg:grid-cols-[88px_minmax(0,1fr)]">
           <StudioNav />
           <main className="min-w-0 bg-[radial-gradient(circle_at_top,rgba(254,104,22,0.06),transparent_22%),linear-gradient(180deg,#0a0c0b_0%,#080909_100%)]">
-            <div className="min-h-screen">
+            <div className="min-h-screen pb-28 lg:pb-0">
               {children}
             </div>
           </main>
