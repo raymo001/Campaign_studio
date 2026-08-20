@@ -77,6 +77,7 @@ test("seedream renderer stays short and front-loaded", () => {
     constraints: ["Preserve geometry.", "Preserve material accuracy."],
     negativeAvoidance: ["distortion", "busy background", "cheap graphics"],
     references: [],
+    referenceCues: [],
   });
 
   assert.match(prompt, /^A clean product-led campaign image/);
