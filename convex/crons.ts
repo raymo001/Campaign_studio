@@ -1,13 +1,7 @@
 import { cronJobs } from "convex/server";
-import { internal } from "./_generated/api";
 
 const crons = cronJobs();
 
-crons.interval(
-  "sync vanpella product feed",
-  { minutes: 30 },
-  internal.feed.internalSyncProducts,
-  {},
-);
-
+// Campaign Studio is intentionally stopped: do not register recurring feed syncs here
+// until Convex usage has been reviewed and the deployment is explicitly re-enabled.
 export default crons;
